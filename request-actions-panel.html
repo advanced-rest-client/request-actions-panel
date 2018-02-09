@@ -1,0 +1,394 @@
+<!--
+@license
+Copyright 2016 The Advanced REST client authors <arc@mulesoft.com>
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../arc-icons/arc-icons.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../openable-panel-behavior/openable-panel-behavior.html">
+<link rel="import" href="request-action-editor.html">
+<!--
+A panel to create and edit request actions.
+
+### Example
+```
+<request-actions-panel actions="{{requestActions}}"></request-actions-panel>
+```
+
+## Action data model
+
+Action can be defined using following properties:
+
+| Property | Type | Description |
+| ----- | ----- | ----- |
+| source | `String` | Source of the data to extract from the request or response object. See below this table for detailed description. |
+| action | `String` | Action to perform. Currently supported are: `assign-variable` -updates variable value in memory, without storing them to the datastore; `store-variable` - updates and stores variable value in the datastore.
+| destination | `String` | For variables manipulation it is the variable name. |
+| enabled | `Boolean` | If sent to false then the action is ignored. |
+
+### Source option and data path
+
+With source string you can instruct the runner from where to take the value for
+action. General structure is:
+
+```
+source object . data type [. path]
+```
+
+Source object can be either `request` or `response`.
+
+Data type describes type of the request / response data. Can be one of:
+- url - URL associated with the request / response
+- status - Only for response data source object. Response's status code.
+- header - Request / response headers
+- body - Request / response body
+
+Path allows to instruct the runner from where specifically in the data type get the value.
+
+For `url` you can define the following properties:
+- host - Returns the host value, e.g. `api.domain.com`
+- protocol - Returns URL protocol, e.g. `https:`
+- path - URL's path, e.g. `/path/to/resource.json`
+- query - Returns full query string, e.g. `version=1&page=test`
+- query.[any string] - Returns the value of a query parameter. For `query.version` it would return `1`
+- hash - Returns everything that is after the `#` character, e.g. `access_token=token&state=A6RT7W`
+- hast.[any string] - It treats hash as a query parameters and returns the value of the parameter. For `hash.access_token` it would return `token`
+
+For `body` you can define path to the value for XML and JSON data only.
+Any other content type will result with `undefined` value.
+
+Path to the data is a JSON path to the value (also for XML).
+
+```javascript
+const json = {
+  property: {
+    otherProperty: {
+      value: 123456
+    }
+  }
+};
+const path = 'property.otherProperty.value';
+// This will return 123456
+```
+
+To access array values put the index in the path:
+
+```javascript
+const json = {
+  items: [{
+    otherProperty: {
+      value: 123456
+    }
+  }]
+};
+const path = 'items.0.otherProperty.value';
+// This will return 123456
+```
+
+Similar for XML:
+
+```javascript
+const xmlStr = `<?xml version="1.0"?>
+<people xmlns:xul="some.xul">
+  <person db-id="test1">
+    <name first="george" last="bush" />
+    <address street="1600 pennsylvania avenue" city="washington" country="usa"/>
+    <phoneNumber>202-456-1111</phoneNumber>
+  </person>
+  <person db-id="test2">
+    <name first="tony" last="blair" />
+    <address street="10 downing street" city="london" country="uk"/>
+    <phoneNumber>020 7925 0918</phoneNumber>
+  </person>
+</people>`;
+path = 'people.person.0.phoneNumber';
+// returns 202-456-1111
+```
+
+XML path supports `attr(ATTRIBUTE NAME)` function that returns the value of the
+attribute:
+
+```javascript
+path = 'people.person.0.name.attr(first)';
+// returns george
+```
+
+## Conditions
+
+You can add a condition to the action so the action will be executed if all conditions are meet.
+
+Condition data model is:
+```javascript
+{
+  source: 'String', // the same as for action
+  operator: 'String', // see below for list of all operators
+  condition: 'any', // value to use to compare the value get from the action `source` property
+  enabled: 'Boolean' // false to ignore the condition.
+}
+```
+
+Operator can be one of:
+- equal
+- not-equal
+- greater-than
+- greater-than-equal
+- less-than
+- less-than-equal
+- contains
+
+Contains can operate on strings, simple arrays (e.g. `['test', 123]`) or objects (e.g. {'key':'value'}).
+
+### Example
+
+```javascript
+const config = {
+  source: 'request.body.items.0.name',
+  action: 'assign-variable',
+  destination: 'someValue',
+  enabled: true,
+  conditions: [{
+    source: 'response.status',
+    operator: 'equal',
+    condition: 200,
+    enabled: true
+  }]
+}
+```
+
+### Styling
+`<request-actions-panel>` provides the following custom properties and mixins for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--request-actions-panel` | Mixin applied to the element | `{}`
+`--request-actions-panel-title` | Mixin applied to the title element. | `{}`
+`--request-actions-panel-empty-screen-color` | Color of the empty screen | `#707070`
+
+@group UI Elements
+@element request-actions-panel
+@demo demo/index.html
+-->
+<dom-module id="request-actions-panel">
+  <template>
+    <style>
+    :host {
+      display: block;
+      @apply --arc-font-body1;
+      @apply --request-actions-panel;
+    }
+
+    header {
+      color: rgba(0, 0, 0, 0.74);
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+
+    h3 {
+      @apply --arc-font-body1;
+      font-size: 20px;
+      @apply --request-actions-panel-title;
+    }
+
+    .help-button {
+      margin-left: 12px;
+      color: var(--inline-fom-action-icon-color, rgba(0, 0, 0, 0.74));
+      transition: color 0.2s linear;
+    }
+
+    .help-button:hover {
+      color: var(--inline-fom-action-icon-color-hover, var(--accent-color, rgba(0, 0, 0, 0.74)));
+    }
+
+    .empty-screen {
+      color: var(--request-actions-panel-empty-screen-color, #707070);
+      margin: 40px 0;
+      @apply --arc-font-body1;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+    }
+
+    .info-header {
+      font-size: 20px;
+    }
+
+    .info-detail {
+      font-size: 16px;
+    }
+
+    .action-button {
+      height: 40px;
+      background-color: var(--primary-color);
+      color: var(--primary-action-color, #fff);
+      @apply --action-button;
+    }
+
+    .action-button:hover {
+      @apply --action-button-hover;
+    }
+    </style>
+    <header>
+      <h3>Request actions</h3>
+      <paper-icon-button class="help-button" icon="arc:help-outline" on-tap="_seekHelp"></paper-icon-button>
+    </header>
+    <template is="dom-if" if="[[!hasActions]]">
+      <div class="empty-screen">
+        <p class="info-header">Define actions to be performed when the request finish.</p>
+        <p class="info-detail">Setup variables from the response and use it in your next request.</p>
+        <paper-button raised class="action-button" on-tap="_addActionHandler">Create an action</paper-button>
+      </div>
+    </template>
+    <template is="dom-if" if="[[hasActions]]">
+      <template is="dom-repeat" items="{{actions}}">
+        <request-action-editor action="{{item}}" variables-suggestions="[[variables]]" opened on-remove-action-item="_removeItem"></request-action-editor>
+      </template>
+      <paper-button on-tap="_addActionHandler">Add action</paper-button>
+    </template>
+  </template>
+  <script>
+  Polymer({
+    is: 'request-actions-panel',
+
+    behaviors: [
+      ArcBehaviors.OpenablePanelBehavior
+    ],
+
+    properties: {
+      /**
+       * Definied actions.
+       */
+      actions: {
+        type: Array,
+        notify: true,
+        observer: '_actionsChanged'
+      },
+      /**
+       * If true then the panel has actions defined.
+       */
+      hasActions: {
+        type: Boolean,
+        value: false,
+        readOnly: true
+      },
+      /**
+       * List of variables names to display in suggestion combobox.
+       * This is is populated automatically from the `variable-list`
+       * custom event (only if variables manager is in the DOM).
+       */
+      variables: Array
+    },
+
+    observers: [
+      '_updateVariablesOpened(_isOpened)',
+      '_actionsChangedNotify(actions.*)'
+    ],
+
+    /**
+     * Opens documentation page for the module.
+     */
+    _seekHelp: function() {
+      let url = 'https://github.com/advanced-rest-client/';
+      url += 'arc-electron/wiki/Request-actions';
+      window.open(url);
+    },
+
+    _actionsChanged: function(value) {
+      var has = !!value;
+      this._setHasActions(has);
+    },
+
+    _addActionHandler: function() {
+      this.addAction();
+    },
+    /**
+     * Adds an action to the UI
+     * @param {?Object} opts Default values for model.
+     */
+    addAction(opts) {
+      if (!opts) {
+        opts = {};
+      }
+      let model = {
+        source: 'response.body',
+        action: 'assign-variable',
+        destination: 'myVar',
+        enabled: true
+      };
+      model = Object.assign(model, opts);
+      if (!this.actions) {
+        this.set('actions', [model]);
+      } else {
+        this.push('actions', model);
+      }
+    },
+
+    _removeItem: function(e) {
+      var index = e.model.get('index');
+      this.splice('actions', index, 1);
+    },
+
+    _updateVariablesOpened: function(_isOpened) {
+      if (!_isOpened) {
+        return;
+      }
+      Polymer.RenderStatus.afterNextRender(this, function() {
+        this.updateVariablesList();
+      });
+    },
+    /**
+     * Updates the list of variables when the panel changes it's state to opened.
+     * It sends `variable-list` so the `variables-manager` elemenet can handle
+     * it and return list of currently loaded variables.
+     */
+    updateVariablesList: function() {
+      var ev = this.fire('variable-list', {}, {
+        cancelable: true
+      });
+      if (!ev.defaultPrevented) {
+        console.warn('variable-list event not handled.');
+        return;
+      }
+      if (!ev.detail.value) {
+        return;
+      }
+      var result = ev.detail.value.filter((item) => {
+        if (!item.enabled) {
+          return false;
+        }
+        if (item.sysVar) {
+          return false;
+        }
+        return true;
+      });
+      result = result.map((item) => item.variable);
+      this.set('variables', result);
+    },
+
+    _actionsChangedNotify: function(record) {
+      if (!record || record.path === 'actions' || record.path === 'actions.splices') {
+        return;
+      }
+      this.debounce('dispatch-actions', function() {
+        this.fire('request-actions-changed', {
+          actions: record.base
+        });
+      }, 250);
+    }
+
+    /**
+     * @event request-actions-changed
+     * @param {Array<Object>} actions List of current actions.
+     */
+  });
+  </script>
+</dom-module>
