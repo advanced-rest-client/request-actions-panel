@@ -163,7 +163,7 @@ Custom property | Description | Default
 ### Events
 | Name | Description | Params |
 | --- | --- | --- |
-| request-actions-changed |  | actions **Array.<Object>** - List of current actions. |
+| request-actions-updated |  | actions **Array.<Object>** - List of current actions. |
 # request-action-editor
 
 Request action editor. Allows to build data model for request action using

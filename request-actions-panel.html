@@ -379,14 +379,14 @@ Custom property | Description | Default
         return;
       }
       this.debounce('dispatch-actions', function() {
-        this.fire('request-actions-changed', {
+        this.fire('request-actions-updated', {
           actions: record.base
         });
       }, 250);
     }
 
     /**
-     * @event request-actions-changed
+     * @event request-actions-updated
      * @param {Array<Object>} actions List of current actions.
      */
   });
