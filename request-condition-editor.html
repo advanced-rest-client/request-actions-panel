@@ -307,6 +307,12 @@ Custom property | Description | Default
     _computePathHidden: function(sourceType) {
       return sourceType === 'status';
     }
+
+    /**
+     * Non bubbling event notifying parent element that this condition is
+     * to be deleted.
+     * @event remove-condition-item
+     */
   });
   </script>
 </dom-module>

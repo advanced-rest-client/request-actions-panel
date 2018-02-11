@@ -1,0 +1,125 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <link rel="import" href="../request-condition-editor.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <request-condition-editor></request-condition-editor>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global fixture, assert, MockInteractions, sinon */
+    suite('basic', function() {
+      const config = {
+        source: 'response.headers.content-type',
+        operator: 'equal',
+        condition: 200
+      };
+      var element;
+      setup(function() {
+        element = fixture('basic');
+        element.condition = Object.assign({}, config);
+      });
+
+      test('source is computed', function() {
+        assert.equal(element.source, 'response');
+      });
+
+      test('sourceType is computed', function() {
+        assert.equal(element.sourceType, 'headers');
+      });
+
+      test('sourcePath is computed', function() {
+        assert.equal(element.sourcePath, 'content-type');
+      });
+
+      test('_cancelSourceProcessing is not set', function() {
+        assert.isFalse(element._cancelSourceProcessing);
+      });
+
+      test('Updates condition.source', function() {
+        element.source = 'request';
+        element.sourceType = 'url';
+        element.sourcePath = 'query';
+        assert.equal(element.condition.source, 'request.url.query');
+      });
+
+      test('source path input is visible', function() {
+        var elm = element.$$('.source-path');
+        var style = getComputedStyle(elm);
+        assert.notEqual(style.display, 'none');
+      });
+
+      test('Hides source path input', function() {
+        element.sourceType = 'status';
+        var elm = element.$$('.source-path');
+        var style = getComputedStyle(elm);
+        assert.equal(style.display, 'none');
+      });
+    });
+
+    suite('_computePathHidden()', function() {
+      var element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns true for status', function() {
+        const result = element._computePathHidden('status');
+        assert.isTrue(result);
+      });
+
+      test('Returns false for other types', function() {
+        assert.isFalse(element._computePathHidden('url'));
+        assert.isFalse(element._computePathHidden('headers'));
+        assert.isFalse(element._computePathHidden('body'));
+      });
+    });
+
+    suite('Delete condition', function() {
+      var element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Dispatches remove-condition-item custom event', function() {
+        const spy = sinon.spy();
+        element.addEventListener('remove-condition-item', spy);
+        var button = element.$$('.delete-icon');
+        MockInteractions.tap(button);
+        assert.isTrue(spy.calledOnce);
+      });
+
+      test('remove-condition-item custom event does not bubble', function(done) {
+        element.addEventListener('remove-condition-item', function clb(e) {
+          element.removeEventListener('remove-condition-item', clb);
+          assert.isFalse(e.bubbles);
+          done();
+        });
+        element.remove();
+      });
+    });
+    </script>
+
+  </body>
+</html>

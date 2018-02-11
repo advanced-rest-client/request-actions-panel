@@ -252,7 +252,7 @@ Custom property | Description | Default
       <template is="dom-repeat" items="{{actions}}">
         <request-action-editor action="{{item}}" variables-suggestions="[[variables]]" opened on-remove-action-item="_removeItem"></request-action-editor>
       </template>
-      <paper-button on-tap="_addActionHandler">Add action</paper-button>
+      <paper-button class="add-action" on-tap="_addActionHandler">Add action</paper-button>
     </template>
   </template>
   <script>
@@ -369,17 +369,28 @@ Custom property | Description | Default
       if (!ev.detail.value) {
         return;
       }
-      var result = ev.detail.value.filter((item) => {
-        if (!item.enabled) {
-          return false;
-        }
-        if (item.sysVar) {
+      var result = this._processVariables(ev.detail.value);
+      this.set('variables', result);
+    },
+    /**
+     * Filters out variables that can't be used in the editor and returns
+     * a list of variable names.
+     *
+     * @param {Array<Object>} vars List of variables
+     * @return {Array<String>} List of filtered variable names.
+     */
+    _processVariables: function(vars) {
+      if (!vars || !vars.length) {
+        return;
+      }
+      var result = vars.filter((item) => {
+        if (item.enabled === false) {
           return false;
         }
         return true;
       });
       result = result.map((item) => item.variable);
-      this.set('variables', result);
+      return result;
     },
 
     _actionsChangedNotify: function(record) {
