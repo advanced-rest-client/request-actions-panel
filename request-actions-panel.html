@@ -299,6 +299,14 @@ Custom property | Description | Default
     _seekHelp: function() {
       let url = 'https://github.com/advanced-rest-client/';
       url += 'arc-electron/wiki/Request-actions';
+      let e = this.fire('open-external-url', {
+        url: url
+      }, {
+        cancelable: true
+      });
+      if (e.defaultPrevented()) {
+        return;
+      }
       window.open(url);
     },
 
