@@ -1,0 +1,150 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <link rel="import" href="../request-actions-panel.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <request-actions-panel attr-for-opened="opened"></request-actions-panel>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global fixture, assert, MockInteractions, sinon, TestHelpers */
+    suite('basic', function() {
+      const config = [{
+        source: 'response.headers.content-type',
+        action: 'assign-variable',
+        destination: 'someValue',
+        enabled: true,
+        conditions: [{
+          source: 'response.status',
+          operator: 'equal',
+          condition: 200,
+          enabled: true
+        }]
+      }];
+      var element;
+      setup(function() {
+        element = fixture('basic');
+        // element.action = Object.assign({}, config);
+      });
+
+      test('hasActions is false', function() {
+        assert.isFalse(element.hasActions);
+      });
+
+      test('Queries for variables list', function(done) {
+        element.addEventListener('variable-list', function clb() {
+          element.removeEventListener('variable-list', clb);
+          done();
+        });
+        element.setAttribute('opened', 'true');
+      });
+
+      test('Sets variables list', function(done) {
+        element.addEventListener('variable-list', function clb(e) {
+          element.removeEventListener('variable-list', clb);
+          e.preventDefault();
+          e.detail.value = [{variable: 'test'}];
+          setTimeout(function() {
+            assert.lengthOf(element.variables, 1);
+            done();
+          }, 5);
+        });
+        element.setAttribute('opened', 'true');
+      });
+
+      test('Filters variables', function(done) {
+        element.addEventListener('variable-list', function clb(e) {
+          element.removeEventListener('variable-list', clb);
+          e.preventDefault();
+          e.detail.value = [{variable: 'test', enabled: false}];
+          setTimeout(function() {
+            assert.lengthOf(element.variables, 0);
+            done();
+          }, 5);
+        });
+        element.setAttribute('opened', 'true');
+      });
+
+      test('Computes hasActions', function() {
+        element.actions = config;
+        assert.isTrue(element.hasActions);
+      });
+
+      test('Empty state screen is rendered', function() {
+        TestHelpers.forceXIfStamp(element);
+        var elm = element.$$('.empty-screen');
+        assert.ok(elm);
+      });
+
+      test('Add button add action', function() {
+        TestHelpers.forceXIfStamp(element);
+        assert.isUndefined(element.actions);
+        var button = element.$$('.action-button');
+        MockInteractions.tap(button);
+        assert.lengthOf(element.actions, 1);
+      });
+
+      test('Hides empty state', function() {
+        TestHelpers.forceXIfStamp(element);
+        element.actions = config;
+        TestHelpers.forceXIfStamp(element);
+        var elm = element.$$('.empty-screen');
+        var style = getComputedStyle(elm);
+        assert.equal(style.display, 'none');
+      });
+    });
+
+    suite('addAction()', function() {
+      var element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Adds condition with default values', function() {
+        element.addAction();
+        var a = element.actions[0];
+        assert.equal(a.source, 'response.body');
+        assert.equal(a.action, 'assign-variable');
+        assert.equal(a.destination, 'myVar');
+        assert.isTrue(a.enabled);
+      });
+
+      test('Adds condition with predefined values', function() {
+        const data = {
+          source: 'response.body',
+          action: 'store-variable',
+          destination: 'test',
+          enabled: false
+        };
+        element.addAction(data);
+        var a = element.actions[0];
+        assert.equal(a.source, data.source);
+        assert.equal(a.action, data.action);
+        assert.equal(a.destination, data.destination);
+        assert.equal(a.enabled, data.enabled);
+      });
+    });
+    </script>
+  </body>
+</html>
