@@ -285,8 +285,8 @@ Custom property | Description | Default
         </template>
       </span>
       <span>
-        <paper-button on-tap="toggleOpened">[[_computeToglePanelLabel(opened)]]</paper-button>
-        <paper-button on-tap="remove">Remove action</paper-button>
+        <paper-button class="toggle-editor" on-tap="toggleOpened">[[_computeToglePanelLabel(opened)]]</paper-button>
+        <paper-button class="remove-action" on-tap="remove">Remove action</paper-button>
       </span>
     </header>
     <iron-collapse opened="[[opened]]">
@@ -322,7 +322,7 @@ Custom property | Description | Default
             </template>
           </div>
         </template>
-        <paper-button on-tap="_appendCondition">Add condition</paper-button>
+        <paper-button class="add-condition" on-tap="_appendCondition">Add condition</paper-button>
       </div>
     </iron-collapse>
   </template>
@@ -447,6 +447,9 @@ Custom property | Description | Default
         enabled: true
       };
       model = Object.assign(model, opts);
+      if (!this.action) {
+        this.action = {};
+      }
       if (!this.action.conditions) {
         this.set('action.conditions', [model]);
       } else {
