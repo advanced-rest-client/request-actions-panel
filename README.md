@@ -417,3 +417,9 @@ Custom property | Description | Default
 `--inline-fom-action-icon-color` | Color of the delete icon | `rgba(0, 0, 0, 0.74)`
 `--inline-fom-action-icon-color-hover` | Color of the delete icon when hovering | `--accent-color` or `rgba(0, 0, 0, 0.74)`
 
+
+
+### Events
+| Name | Description | Params |
+| --- | --- | --- |
+| remove-condition-item | Non bubbling event notifying parent element that this condition is to be deleted. | __none__ |
