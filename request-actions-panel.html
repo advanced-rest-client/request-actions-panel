@@ -166,6 +166,44 @@ const config = {
 }
 ```
 
+## Iterables
+
+Value for action can be extracted from the response body after iteraiting over
+iterable data types (array, object). In this case action's `source` property
+should be relative to the object that matches ierator definition.
+
+Iterables can be mixed with conditions. Conditions are checked first, before
+action is performed.
+
+### Example
+
+Getting value from the same object.
+
+```javascript
+// Action configuration
+const config = {
+  source: 'id',
+  action: 'assign-variable',
+  destination: 'personId',
+  iterator: {
+    source: 'items.*.name',
+    operator: 'equal',
+    condition: 'Smith'
+  }
+}
+// Response
+const response = {
+  items: [{
+    id: 1234,
+    name: 'Brown'
+  }, {
+    id: 5678,
+    name: 'Smith'
+  }]
+}
+```
+Result of the above model would result with assigning `5678` to `personId` variable.
+
 ### Styling
 `<request-actions-panel>` provides the following custom properties and mixins for styling:
 

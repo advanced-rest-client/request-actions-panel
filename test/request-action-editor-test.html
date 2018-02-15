@@ -277,6 +277,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
     });
 
+    suite('Iterable editor', function() {
+      var element;
+      setup(function() {
+        element = fixture('basic');
+        element.action = {
+          source: 'response.body.value',
+          action: 'assign-variable',
+          destination: 'someValue',
+          enabled: true
+        };
+        TestHelpers.forceXIfStamp(element);
+      });
+
+      test('Computes _renderIterator', function() {
+        assert.isTrue(element._renderIterator);
+      });
+
+      test('action.hasIterator is undefined', function() {
+        assert.isUndefined(element.action.hasIterator);
+      });
+
+      test('Hiddes the iterator toggle button', function() {
+        element.sourceType = 'headers';
+        TestHelpers.forceXIfStamp(element);
+        assert.isFalse(element._renderIterator);
+        const toggle = element.$$('.iterator-enabler');
+        const style = getComputedStyle(toggle);
+        assert.equal(style.display, 'none');
+      });
+
+      test('Renders iterable editor', function() {
+        const toggle = element.$$('[data-action="iterable-toggle"]');
+        MockInteractions.tap(toggle);
+        TestHelpers.forceXIfStamp(element);
+        const editor = element.$$('request-action-iterator-editor');
+        assert.ok(editor);
+      });
+
+      test('Creates default values', function() {
+        element.set('action.hasIterator', true);
+        assert.equal(element.action.iterator.source, 'data.*.property');
+        assert.equal(element.action.iterator.operator, 'equal');
+      });
+    });
+
     suite('Opened', function() {
       var element;
       setup(function() {

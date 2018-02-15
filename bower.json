@@ -1,7 +1,7 @@
 {
   "name": "request-actions-panel",
   "description": "A panel to define request actions",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "license": "Apache-2.0 OR CC-BY-4.0",
   "authors": [
     "The Advanced REST client authors <arc@mulesoft.com>"
@@ -34,7 +34,8 @@
     "paper-combobox": "advanced-rest-client/paper-combobox#^0.1.1",
     "paper-toggle-button": "PolymerElements/paper-toggle-button#<2",
     "openable-panel-behavior": "advanced-rest-client/openable-panel-behavior#^0.1.2",
-    "iron-collapse": "PolymerElements/iron-collapse#<2"
+    "iron-collapse": "PolymerElements/iron-collapse#<2",
+    "condition-operator-dropdown": "advanced-rest-client/condition-operator-dropdown#^0.1.1"
   },
   "devDependencies": {
     "iron-component-page": "polymerelements/iron-component-page#1.0.0",

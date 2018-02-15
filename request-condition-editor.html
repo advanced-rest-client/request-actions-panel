@@ -21,6 +21,7 @@ the License.
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../condition-operator-dropdown/condition-operator-dropdown.html">
 <!--
 An editor for request / response editors.
 It creates data model that is accetable in ARC elements ecosystem for conditions.
@@ -103,7 +104,7 @@ const config = {
 ```
 
 ### Styling
-`<request-actions-panel>` provides the following custom properties and mixins for styling:
+`<request-condition-editor>` provides the following custom properties and mixins for styling:
 
 Custom property | Description | Default
 ----------------|-------------|----------
@@ -198,17 +199,7 @@ Custom property | Description | Default
           </paper-listbox>
         </paper-dropdown-menu-light>
         <paper-input label="Path to data (optional)" value="{{sourcePath}}" class="source-path" hidden$="[[_computePathHidden(sourceType)]]"></paper-input>
-        <paper-dropdown-menu-light label="Operator" dynamic-align class="condition-type">
-          <paper-listbox class="dropdown-content" selected="{{condition.operator}}" attr-for-selected="value">
-            <paper-item value="equal">Equal</paper-item>
-            <paper-item value="not-equal">Not equal</paper-item>
-            <paper-item value="greater-than">Greater than</paper-item>
-            <paper-item value="greater-than-equal">Greater than or equal</paper-item>
-            <paper-item value="less-than">Less than</paper-item>
-            <paper-item value="less-than-equal">Less than or equal</paper-item>
-            <paper-item value="contains">Contains</paper-item>
-          </paper-listbox>
-        </paper-dropdown-menu-light>
+        <condition-operator-dropdown class="condition-type" value="{{condition.operator}}" required></condition-operator-dropdown>
         <paper-input label="Condition value" required auto-validate value="{{condition.condition}}" class="condition"></paper-input>
       </div>
       <span>
