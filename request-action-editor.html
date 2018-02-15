@@ -23,6 +23,7 @@ the License.
 <link rel="import" href="../paper-combobox/paper-combobox.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
 <link rel="import" href="request-condition-editor.html">
+<link rel="import" href="request-action-iterator-editor.html">
 <!--
 Request action editor. Allows to build data model for request action using
 convinient UI.
@@ -204,7 +205,8 @@ Custom property | Description | Default
     }
 
     header,
-    .action-enabler {
+    .action-enabler,
+    .iterator-enabler {
       @apply --layout-horizontal;
       @apply --layout-center;
     }
@@ -270,6 +272,11 @@ Custom property | Description | Default
     .action-label {
       @apply --paper-font-common-nowrap;
     }
+
+    .bottom-acctions {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
     </style>
     <header>
       <template is="dom-if" if="[[opened]]">
@@ -322,7 +329,18 @@ Custom property | Description | Default
             </template>
           </div>
         </template>
-        <paper-button class="add-condition" on-tap="_appendCondition">Add condition</paper-button>
+        <div class="bottom-acctions">
+          <paper-button class="add-condition" on-tap="_appendCondition">Add condition</paper-button>
+          <template is="dom-if" if="[[_renderIterator]]">
+            <span class="iterator-enabler">
+              <paper-toggle-button checked="{{action.hasIterator}}" data-action="iterable-toggle"></paper-toggle-button>
+              Iterator [[_computeIteratorStateLabel(action.hasIterator)]]
+            </span>
+          </template>
+        </div>
+        <template is="dom-if" if="[[action.hasIterator]]">
+          <request-action-iterator-editor iterator="{{action.iterator}}"></request-action-iterator-editor>
+        </template>
       </div>
     </iron-collapse>
   </template>
@@ -363,10 +381,17 @@ Custom property | Description | Default
       opened: {
         type: Boolean,
         value: false
+      },
+      _renderIterator: {
+        type: Boolean,
+        computed: '_computeRenderIterator(source,sourceType)'
       }
     },
 
-    observers: ['_computeSourcePath(source,sourceType,sourcePath)'],
+    observers: [
+      '_computeSourcePath(source,sourceType,sourcePath)',
+      '_hasIteratorChanged(action.hasIterator)'
+    ],
     // Clears the path info.
     clear: function() {
       this.source = '';
@@ -467,6 +492,9 @@ Custom property | Description | Default
     _computeActionStateLabel: function(enabled) {
       return enabled ? 'enabled' : 'disabled';
     },
+    _computeIteratorStateLabel: function(enabled) {
+      return enabled ? 'enabled' : 'disabled';
+    },
     // Computes label for toggle editor state button.
     _computeToglePanelLabel: function(opened) {
       return opened ? 'Hide editor' : 'Show editor';
@@ -484,6 +512,27 @@ Custom property | Description | Default
      */
     _computeActionLabel: function(action) {
       return action === 'assign-variable' ? 'Assign variable' : 'Store variable';
+    },
+
+    _hasIteratorChanged: function(enabled) {
+      if (!enabled) {
+        return;
+      }
+      if (this.action.iterator) {
+        return;
+      }
+      this.set('action.iterator', {
+        source: 'data.*.property',
+        operator: 'equal',
+        condition: ''
+      });
+    },
+
+    _computeRenderIterator: function(source, sourceType) {
+      if (source === 'response' && sourceType === 'body') {
+        return true;
+      }
+      return false;
     }
   });
   </script>

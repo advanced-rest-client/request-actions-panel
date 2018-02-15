@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/test-helpers.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <link rel="import" href="../request-action-iterator-editor.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <request-action-iterator-editor></request-action-iterator-editor>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global fixture, assert, sinon */
+    suite('basic', function() {
+      const config = {
+        source: 'path.to.*.value',
+        operator: 'equal',
+        condition: 'something'
+      };
+      var element;
+      setup(function() {
+        element = fixture('basic');
+        element.iterator = Object.assign({}, config);
+      });
+
+      test('Change in the model dispatches event', function() {
+        const input = element.$$('paper-input');
+        const spy = sinon.spy();
+        element.addEventListener('iterator-changed', spy);
+        input.value = 'test';
+        assert.isTrue(spy.calledOnce);
+      });
+    });
+    </script>
+
+  </body>
+</html>
