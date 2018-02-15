@@ -1,3 +1,13 @@
+<a name="0.1.8"></a>
+## [0.1.8](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.7...0.1.8) (2018-02-15)
+
+
+### New
+
+* Added iteration editor to the panel. ([320ca319dc9b298a989ab0eefdcc500a237d7a6d](https://github.com/advanced-rest-client/request-actions-panel/commit/320ca319dc9b298a989ab0eefdcc500a237d7a6d))
+
+
+
 <a name="0.1.7"></a>
 ## [0.1.7](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.6...0.1.7) (2018-02-11)
 
