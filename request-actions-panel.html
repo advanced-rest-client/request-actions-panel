@@ -285,7 +285,7 @@ Custom property | Description | Default
       <div class="empty-screen">
         <p class="info-header">Define actions to be performed before request start.</p>
         <p class="info-detail">Setup variables to be used with the request.</p>
-        <paper-button raised class="action-button" on-tap="_addPreActionHandler">Create request action</paper-button>
+        <paper-button data-action="add-pre" raised class="action-button" on-tap="_addPreActionHandler">Create request action</paper-button>
       </div>
     </template>
     <template is="dom-if" if="[[hasActions]]">
@@ -302,7 +302,7 @@ Custom property | Description | Default
       <div class="empty-screen">
         <p class="info-header">Define actions to be performed when response is ready.</p>
         <p class="info-detail">Setup variables from the response and use it in your next request.</p>
-        <paper-button raised class="action-button" on-tap="_addPostActionHandler">Create response action</paper-button>
+        <paper-button data-action="add-post" raised class="action-button" on-tap="_addPostActionHandler">Create response action</paper-button>
       </div>
     </template>
     <template is="dom-if" if="[[hasActions]]">
