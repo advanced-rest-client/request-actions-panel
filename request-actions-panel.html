@@ -342,7 +342,7 @@ Custom property | Description | Default
       }, {
         cancelable: true
       });
-      if (e.defaultPrevented()) {
+      if (e.defaultPrevented) {
         return;
       }
       window.open(url);
