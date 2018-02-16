@@ -1,3 +1,25 @@
+<a name="0.1.10"></a>
+## [0.1.10](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.9...0.1.10) (2018-02-16)
+
+
+### Breaking
+
+* adding request actions. ([838df7e99fbc80fd2c76267fd0e42515964931be](https://github.com/advanced-rest-client/request-actions-panel/commit/838df7e99fbc80fd2c76267fd0e42515964931be))
+
+### Docs
+
+* Updated docs for the element. ([3643d492c52fb3ec27a428b13deed1328aae952d](https://github.com/advanced-rest-client/request-actions-panel/commit/3643d492c52fb3ec27a428b13deed1328aae952d))
+
+### Fix
+
+* Fixed event handling ([be0b296077aba4747647dcf35f6de2d10f402ceb](https://github.com/advanced-rest-client/request-actions-panel/commit/be0b296077aba4747647dcf35f6de2d10f402ceb))
+
+### Update
+
+* Adding missing import ([2fb4f94f0aeff632e18c4db48d62ef33d9be61b1](https://github.com/advanced-rest-client/request-actions-panel/commit/2fb4f94f0aeff632e18c4db48d62ef33d9be61b1))
+
+
+
 <a name="0.1.9"></a>
 ## [0.1.9](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.8...0.1.9) (2018-02-15)
 

@@ -196,12 +196,6 @@ Custom property | Description | Default
 `--request-actions-panel-title` | Mixin applied to the title element. | `{}`
 `--request-actions-panel-empty-screen-color` | Color of the empty screen | `#707070`
 
-
-
-### Events
-| Name | Description | Params |
-| --- | --- | --- |
-| request-actions-updated |  | actions **Array.<Object>** - List of current actions. |
 # request-action-editor
 
 Request action editor. Allows to build data model for request action using

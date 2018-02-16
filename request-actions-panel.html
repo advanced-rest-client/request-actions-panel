@@ -18,6 +18,8 @@ the License.
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../openable-panel-behavior/openable-panel-behavior.html">
 <link rel="import" href="request-action-editor.html">
+<link rel="import" href="request-variable-editor.html">
+
 <!--
 A panel to create and edit request actions.
 
@@ -281,16 +283,33 @@ Custom property | Description | Default
     </header>
     <template is="dom-if" if="[[!hasActions]]">
       <div class="empty-screen">
-        <p class="info-header">Define actions to be performed when the request finish.</p>
-        <p class="info-detail">Setup variables from the response and use it in your next request.</p>
-        <paper-button raised class="action-button" on-tap="_addActionHandler">Create an action</paper-button>
+        <p class="info-header">Define actions to be performed before request start.</p>
+        <p class="info-detail">Setup variables to be used with the request.</p>
+        <paper-button data-action="add-pre" raised class="action-button" on-tap="_addPreActionHandler">Create request action</paper-button>
       </div>
     </template>
     <template is="dom-if" if="[[hasActions]]">
-      <template is="dom-repeat" items="{{actions}}">
-        <request-action-editor action="{{item}}" variables-suggestions="[[variables]]" opened on-remove-action-item="_removeItem"></request-action-editor>
+      <template is="dom-repeat" items="{{beforeActions.variables}}">
+        <request-variable-editor action="{{item}}" variables-suggestions="[[variables]]" on-remove-action-item="_removePreItem"></request-variable-editor>
       </template>
-      <paper-button class="add-action" on-tap="_addActionHandler">Add action</paper-button>
+      <paper-button class="add-action" on-tap="_addPreActionHandler">Add request action</paper-button>
+    </template>
+    <header>
+      <h3>Response actions</h3>
+      <paper-icon-button class="help-button" icon="arc:help-outline" on-tap="_seekHelp"></paper-icon-button>
+    </header>
+    <template is="dom-if" if="[[!hasActions]]">
+      <div class="empty-screen">
+        <p class="info-header">Define actions to be performed when response is ready.</p>
+        <p class="info-detail">Setup variables from the response and use it in your next request.</p>
+        <paper-button data-action="add-post" raised class="action-button" on-tap="_addPostActionHandler">Create response action</paper-button>
+      </div>
+    </template>
+    <template is="dom-if" if="[[hasActions]]">
+      <template is="dom-repeat" items="{{afterActions}}">
+        <request-action-editor action="{{item}}" variables-suggestions="[[variables]]" opened on-remove-action-item="_removePostItem"></request-action-editor>
+      </template>
+      <paper-button class="add-action" on-tap="_addPostActionHandler">Add response action</paper-button>
     </template>
   </template>
   <script>
@@ -303,20 +322,43 @@ Custom property | Description | Default
 
     properties: {
       /**
-       * Definied actions.
+       * Model for actions to be preformed after the request
        */
-      actions: {
+      afterActions: {
         type: Array,
         notify: true,
-        observer: '_actionsChanged'
+        observer: '_afterActionsChanged'
+      },
+      /**
+       * Model for actions to be preformed before the request
+       */
+      beforeActions: {
+        type: Array,
+        notify: true,
+        observer: '_beforeActionsChanged'
       },
       /**
        * If true then the panel has actions defined.
        */
-      hasActions: {
+      hasPostActions: {
         type: Boolean,
         value: false,
         readOnly: true
+      },
+      /**
+       * If true then the panel has pre-actions defined.
+       */
+      hasPreActions: {
+        type: Boolean,
+        value: false,
+        readOnly: true
+      },
+      /**
+       * Indicates if any action has been defined for this request.
+       */
+      hasActions: {
+        type: Boolean,
+        computed: '_computeHasActions(hasPostActions, hasPreActions)'
       },
       /**
        * List of variables names to display in suggestion combobox.
@@ -327,8 +369,7 @@ Custom property | Description | Default
     },
 
     observers: [
-      '_updateVariablesOpened(_isOpened)',
-      '_actionsChangedNotify(actions.*)'
+      '_updateVariablesOpened(_isOpened)'
     ],
 
     /**
@@ -342,25 +383,50 @@ Custom property | Description | Default
       }, {
         cancelable: true
       });
-      if (e.defaultPrevented()) {
+      if (e.defaultPrevented) {
         return;
       }
       window.open(url);
     },
-
-    _actionsChanged: function(value) {
+    /**
+     * Computes value for `hasPostActions` based on post actions.
+     * @param {Array|undefined} value Current post actions
+     */
+    _afterActionsChanged: function(value) {
       var has = !!value;
-      this._setHasActions(has);
-    },
-
-    _addActionHandler: function() {
-      this.addAction();
+      this._setHasPostActions(has);
     },
     /**
-     * Adds an action to the UI
+     * Computes value for `hasPreActions` based on pre actions.
+     * @param {Array|undefined} value Current pre actions
+     */
+    _beforeActionsChanged: function(value) {
+      var has = !!value;
+      this._setHasPreActions(has);
+    },
+    /**
+     * Computes value for `hasActions` propety.
+     *
+     * @param {Boolean} hasPostActions Current value of hasPostActions
+     * @param {Boolean} hasPreActions Current value of hasPreActions
+     * @return {Boolean} True if any action is defined.
+     */
+    _computeHasActions: function(hasPostActions, hasPreActions) {
+      return hasPostActions || hasPreActions;
+    },
+
+    _addPostActionHandler: function() {
+      this.addPostAction();
+    },
+
+    _addPreActionHandler: function() {
+      this.addPreAction();
+    },
+    /**
+     * Adds a post action to the UI.
      * @param {?Object} opts Default values for model.
      */
-    addAction(opts) {
+    addPostAction(opts) {
       if (!opts) {
         opts = {};
       }
@@ -371,16 +437,55 @@ Custom property | Description | Default
         enabled: true
       };
       model = Object.assign(model, opts);
-      if (!this.actions) {
-        this.set('actions', [model]);
+      if (!this.afterActions) {
+        this.set('afterActions', [model]);
       } else {
-        this.push('actions', model);
+        this.push('afterActions', model);
       }
     },
 
-    _removeItem: function(e) {
+    /**
+     * Adds a pre action to the UI
+     * @param {?Object} opts Default values for model.
+     */
+    addPreAction(opts) {
+      if (!opts) {
+        opts = {};
+      }
+      let model = {
+        variable: 'myVar',
+        value: '',
+        enabled: true
+      };
+      model = Object.assign(model, opts);
+      let setNew = false;
+      if (!this.beforeActions) {
+        setNew = true;
+        this.beforeActions = {
+          variables: []
+        };
+      }
+      if (setNew) {
+        this.set('beforeActions.variables', [model]);
+      } else {
+        this.push('beforeActions.variables', model);
+      }
+    },
+
+    _removePostItem: function(e) {
       var index = e.model.get('index');
-      this.splice('actions', index, 1);
+      this.splice('afterActions', index, 1);
+      if (this.afterActions.length === 0) {
+        this.afterActions = undefined;
+      }
+    },
+
+    _removePreItem: function(e) {
+      var index = e.model.get('index');
+      this.splice('beforeActions.variables', index, 1);
+      if (this.beforeActions.variables.length === 0) {
+        this.beforeActions = undefined;
+      }
     },
 
     _updateVariablesOpened: function(_isOpened) {
@@ -429,23 +534,7 @@ Custom property | Description | Default
       });
       result = result.map((item) => item.variable);
       return result;
-    },
-
-    _actionsChangedNotify: function(record) {
-      if (!record || record.path === 'actions' || record.path === 'actions.splices') {
-        return;
-      }
-      this.debounce('dispatch-actions', function() {
-        this.fire('request-actions-updated', {
-          actions: record.base
-        });
-      }, 250);
     }
-
-    /**
-     * @event request-actions-updated
-     * @param {Array<Object>} actions List of current actions.
-     */
   });
   </script>
 </dom-module>
