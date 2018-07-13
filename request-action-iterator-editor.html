@@ -11,13 +11,13 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../condition-operator-dropdown/condition-operator-dropdown.html">
+<link rel="import" href="condition-operator-dropdown.html">
 <!--
 An editor for response iterator.
 It creates data model that is accetable in ARC elements ecosystem for creating iteration over a value (JSON, XML).
@@ -127,8 +127,9 @@ Custom property | Description | Default
 `--request-action-iterator-editor` | Mixin applied to the element | `{}`
 `--request-action-iterator-editor-background-color` | Background color of the editor | `#fff`
 
-@group UI Elements
-@element request-action-iterator-editor
+@polymer
+@customElement
+@memberof UiElements
 @demo demo/index.html
 -->
 <dom-module id="request-action-iterator-editor">
@@ -183,17 +184,20 @@ Custom property | Description | Default
     </div>
   </template>
   <script>
-  Polymer({
-    is: 'request-action-iterator-editor',
-    properties: {
-      /**
-       * Model for iterator.
-       */
-      iterator: {
-        type: Object,
-        notify: true
-      }
+  class RequestActionIteratorEditor extends Polymer.Element {
+    static get is() { return 'request-action-iterator-editor';}
+    static get properties() {
+      return {
+        /**
+         * Model for iterator.
+         */
+        iterator: {
+          type: Object,
+          notify: true
+        }
+      };
     }
-  });
+  }
+  window.customElements.define(RequestActionIteratorEditor.is, RequestActionIteratorEditor);
   </script>
 </dom-module>

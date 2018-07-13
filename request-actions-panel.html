@@ -11,15 +11,13 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../arc-icons/arc-icons.html">
 <link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../openable-panel-behavior/openable-panel-behavior.html">
 <link rel="import" href="request-action-editor.html">
 <link rel="import" href="request-variable-editor.html">
-
 <!--
 A panel to create and edit request actions.
 
@@ -215,8 +213,9 @@ Custom property | Description | Default
 `--request-actions-panel-title` | Mixin applied to the title element. | `{}`
 `--request-actions-panel-empty-screen-color` | Color of the empty screen | `#707070`
 
-@group UI Elements
-@element request-actions-panel
+@polymer
+@customElement
+@memberof UiElements
 @demo demo/index.html
 -->
 <dom-module id="request-actions-panel">
@@ -313,97 +312,100 @@ Custom property | Description | Default
     </template>
   </template>
   <script>
-  Polymer({
-    is: 'request-actions-panel',
+  class RequestActionsPanel extends Polymer.Element {
+    static get is() { return 'request-actions-panel';}
+    static get properties() {
+      return {
+        /**
+         * Model for actions to be preformed after the request
+         */
+        afterActions: {
+          type: Array,
+          notify: true,
+          observer: '_afterActionsChanged'
+        },
+        /**
+         * Model for actions to be preformed before the request
+         */
+        beforeActions: {
+          type: Array,
+          notify: true,
+          observer: '_beforeActionsChanged'
+        },
+        /**
+         * If true then the panel has actions defined.
+         */
+        hasPostActions: {
+          type: Boolean,
+          value: false,
+          readOnly: true
+        },
+        /**
+         * If true then the panel has pre-actions defined.
+         */
+        hasPreActions: {
+          type: Boolean,
+          value: false,
+          readOnly: true
+        },
+        /**
+         * Indicates if any action has been defined for this request.
+         */
+        hasActions: {
+          type: Boolean,
+          computed: '_computeHasActions(hasPostActions, hasPreActions)'
+        },
+        /**
+         * List of variables names to display in suggestion combobox.
+         * This is is populated automatically from the `variable-list`
+         * custom event (only if variables manager is in the DOM).
+         */
+        variables: Array
+      };
+    }
 
-    behaviors: [
-      ArcBehaviors.OpenablePanelBehavior
-    ],
-
-    properties: {
-      /**
-       * Model for actions to be preformed after the request
-       */
-      afterActions: {
-        type: Array,
-        notify: true,
-        observer: '_afterActionsChanged'
-      },
-      /**
-       * Model for actions to be preformed before the request
-       */
-      beforeActions: {
-        type: Array,
-        notify: true,
-        observer: '_beforeActionsChanged'
-      },
-      /**
-       * If true then the panel has actions defined.
-       */
-      hasPostActions: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
-      /**
-       * If true then the panel has pre-actions defined.
-       */
-      hasPreActions: {
-        type: Boolean,
-        value: false,
-        readOnly: true
-      },
-      /**
-       * Indicates if any action has been defined for this request.
-       */
-      hasActions: {
-        type: Boolean,
-        computed: '_computeHasActions(hasPostActions, hasPreActions)'
-      },
-      /**
-       * List of variables names to display in suggestion combobox.
-       * This is is populated automatically from the `variable-list`
-       * custom event (only if variables manager is in the DOM).
-       */
-      variables: Array
-    },
-
-    observers: [
-      '_updateVariablesOpened(_isOpened)'
-    ],
+    connectedCallback() {
+      super.connectedCallback();
+      Polymer.RenderStatus.afterNextRender(this, function() {
+        this.updateVariablesList();
+      });
+    }
 
     /**
      * Opens documentation page for the module.
      */
-    _seekHelp: function() {
+    _seekHelp() {
       let url = 'https://github.com/advanced-rest-client/';
       url += 'arc-electron/wiki/Request-actions';
-      let e = this.fire('open-external-url', {
-        url: url
-      }, {
-        cancelable: true
+      const e = new CustomEvent('open-external-url', {
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          url: url
+        }
       });
+      this.dispatchEvent(e);
       if (e.defaultPrevented) {
         return;
       }
       window.open(url);
-    },
+    }
     /**
      * Computes value for `hasPostActions` based on post actions.
      * @param {Array|undefined} value Current post actions
      */
-    _afterActionsChanged: function(value) {
-      var has = !!value;
+    _afterActionsChanged(value) {
+      const has = !!value;
       this._setHasPostActions(has);
-    },
+    }
     /**
      * Computes value for `hasPreActions` based on pre actions.
      * @param {Array|undefined} value Current pre actions
      */
-    _beforeActionsChanged: function(value) {
-      var has = !!value;
+    _beforeActionsChanged(value) {
+      const has = !!value;
       this._setHasPreActions(has);
-    },
+    }
     /**
      * Computes value for `hasActions` propety.
      *
@@ -411,17 +413,17 @@ Custom property | Description | Default
      * @param {Boolean} hasPreActions Current value of hasPreActions
      * @return {Boolean} True if any action is defined.
      */
-    _computeHasActions: function(hasPostActions, hasPreActions) {
+    _computeHasActions(hasPostActions, hasPreActions) {
       return hasPostActions || hasPreActions;
-    },
+    }
 
-    _addPostActionHandler: function() {
+    _addPostActionHandler() {
       this.addPostAction();
-    },
+    }
 
-    _addPreActionHandler: function() {
+    _addPreActionHandler() {
       this.addPreAction();
-    },
+    }
     /**
      * Adds a post action to the UI.
      * @param {?Object} opts Default values for model.
@@ -442,7 +444,7 @@ Custom property | Description | Default
       } else {
         this.push('afterActions', model);
       }
-    },
+    }
 
     /**
      * Adds a pre action to the UI
@@ -470,51 +472,45 @@ Custom property | Description | Default
       } else {
         this.push('beforeActions.variables', model);
       }
-    },
+    }
 
-    _removePostItem: function(e) {
-      var index = e.model.get('index');
+    _removePostItem(e) {
+      const index = e.model.get('index');
       this.splice('afterActions', index, 1);
       if (this.afterActions.length === 0) {
         this.afterActions = undefined;
       }
-    },
+    }
 
-    _removePreItem: function(e) {
-      var index = e.model.get('index');
+    _removePreItem(e) {
+      const index = e.model.get('index');
       this.splice('beforeActions.variables', index, 1);
       if (this.beforeActions.variables.length === 0) {
         this.beforeActions = undefined;
       }
-    },
-
-    _updateVariablesOpened: function(_isOpened) {
-      if (!_isOpened) {
-        return;
-      }
-      Polymer.RenderStatus.afterNextRender(this, function() {
-        this.updateVariablesList();
-      });
-    },
+    }
     /**
      * Updates the list of variables when the panel changes it's state to opened.
      * It sends `variable-list` so the `variables-manager` elemenet can handle
      * it and return list of currently loaded variables.
      */
-    updateVariablesList: function() {
-      var ev = this.fire('variable-list', {}, {
-        cancelable: true
+    updateVariablesList() {
+      const e = new CustomEvent('variable-list', {
+        bubbles: true,
+        cancelable: true,
+        detail: {}
       });
-      if (!ev.defaultPrevented) {
+      this.dispatchEvent(e);
+      if (!e.defaultPrevented) {
         console.warn('variable-list event not handled.');
         return;
       }
-      if (!ev.detail.value) {
+      if (!e.detail.value) {
         return;
       }
-      var result = this._processVariables(ev.detail.value);
+      const result = this._processVariables(e.detail.value);
       this.set('variables', result);
-    },
+    }
     /**
      * Filters out variables that can't be used in the editor and returns
      * a list of variable names.
@@ -522,11 +518,11 @@ Custom property | Description | Default
      * @param {Array<Object>} vars List of variables
      * @return {Array<String>} List of filtered variable names.
      */
-    _processVariables: function(vars) {
+    _processVariables(vars) {
       if (!vars || !vars.length) {
         return;
       }
-      var result = vars.filter((item) => {
+      let result = vars.filter((item) => {
         if (item.enabled === false) {
           return false;
         }
@@ -535,6 +531,7 @@ Custom property | Description | Default
       result = result.map((item) => item.variable);
       return result;
     }
-  });
+  }
+  window.customElements.define(RequestActionsPanel.is, RequestActionsPanel);
   </script>
 </dom-module>

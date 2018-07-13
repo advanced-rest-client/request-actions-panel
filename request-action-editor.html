@@ -11,7 +11,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../arc-icons/arc-icons.html">
 <link rel="import" href="../paper-button/paper-button.html">
@@ -184,8 +184,9 @@ Custom property | Description | Default
 `--request-action-editor-closed-bar-height` | Height of the item when collapsed. | `48px`
 `--request-action-editor-closed-info-color` | Color of the collapsed info label | `rgba(0, 0, 0, 0.87)`
 
-@group UI Elements
-@element request-action-editor
+@polymer
+@customElement
+@memberof UiElements
 @demo demo/index.html
 -->
 <dom-module id="request-action-editor">
@@ -300,13 +301,13 @@ Custom property | Description | Default
       <div class="form">
         <div class="action-form">
           <paper-dropdown-menu-light label="Source" dynamic-align class="source-main">
-            <paper-listbox class="dropdown-content" selected="{{source}}" attr-for-selected="value">
+            <paper-listbox slot="dropdown-content" selected="{{source}}" attr-for-selected="value">
               <paper-item value="request">Request</paper-item>
               <paper-item value="response">Response</paper-item>
             </paper-listbox>
           </paper-dropdown-menu-light>
           <paper-dropdown-menu-light label="Type" dynamic-align class="source-type">
-            <paper-listbox class="dropdown-content" selected="{{sourceType}}" attr-for-selected="value">
+            <paper-listbox slot="dropdown-content" selected="{{sourceType}}" attr-for-selected="value">
               <paper-item value="url">Url</paper-item>
               <paper-item value="status">Status code</paper-item>
               <paper-item value="headers">Headers</paper-item>
@@ -315,7 +316,7 @@ Custom property | Description | Default
           </paper-dropdown-menu-light>
           <paper-input label="Path to data (optional)" value="{{sourcePath}}" class="source-path" hidden$="[[_computePathHidden(sourceType)]]"></paper-input>
           <paper-dropdown-menu-light label="Action type" dynamic-align class="action-type">
-            <paper-listbox class="dropdown-content" selected="{{action.action}}" attr-for-selected="value">
+            <paper-listbox slot="dropdown-content" selected="{{action.action}}" attr-for-selected="value">
               <paper-item value="assign-variable">Assign variable</paper-item>
               <paper-item value="store-variable">Store variable</paper-item>
             </paper-listbox>
@@ -345,62 +346,67 @@ Custom property | Description | Default
     </iron-collapse>
   </template>
   <script>
-  Polymer({
-    is: 'request-action-editor',
-    properties: {
-      /**
-       * Definied action.
-       */
-      action: {
-        type: Object,
-        notify: true,
-        observer: '_actionChanged'
-      },
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to source input field.
-       */
-      source: String,
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to source type input field.
-       */
-      sourceType: String,
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to path input field.
-       */
-      sourcePath: String,
-      /**
-       * List of variables sugesstions to display in the combo box.
-       */
-      variablesSuggestions: Array,
-      /**
-       * True to open the editor view.
-       */
-      opened: {
-        type: Boolean,
-        value: false
-      },
-      _renderIterator: {
-        type: Boolean,
-        computed: '_computeRenderIterator(source,sourceType)'
-      }
-    },
+  class RequestActionEditor extends Polymer.Element {
+    static get is() { return 'request-action-editor';}
+    static get properties() {
+      return {
+        /**
+         * Definied action.
+         */
+        action: {
+          type: Object,
+          notify: true,
+          observer: '_actionChanged'
+        },
+        /**
+         * Value computed from the `action.source` property.
+         * Binded to source input field.
+         */
+        source: String,
+        /**
+         * Value computed from the `action.source` property.
+         * Binded to source type input field.
+         */
+        sourceType: String,
+        /**
+         * Value computed from the `action.source` property.
+         * Binded to path input field.
+         */
+        sourcePath: String,
+        /**
+         * List of variables sugesstions to display in the combo box.
+         */
+        variablesSuggestions: Array,
+        /**
+         * True to open the editor view.
+         */
+        opened: {
+          type: Boolean,
+          value: false
+        },
+        _renderIterator: {
+          type: Boolean,
+          computed: '_computeRenderIterator(source,sourceType)'
+        }
+      };
+    }
 
-    observers: [
-      '_computeSourcePath(source,sourceType,sourcePath)',
-      '_hasIteratorChanged(action.hasIterator)'
-    ],
+    static get observers() {
+      return [
+        '_computeSourcePath(source,sourceType,sourcePath)',
+        '_hasIteratorChanged(action.hasIterator)'
+      ];
+    }
+
     // Clears the path info.
-    clear: function() {
+    clear() {
       this.source = '';
       this.sourceType = '';
       this.sourcePath = '';
-    },
+    }
 
-    _actionChanged: function(action) {
-      var hasSource = action && action.source;
+    _actionChanged(action) {
+      const hasSource = action && action.source;
       if (hasSource) {
         this._cancelSourceProcessing = true;
       }
@@ -409,26 +415,26 @@ Custom property | Description | Default
         this._cancelSourceProcessing = false;
         this._processSource(action.source);
       }
-    },
+    }
     /**
      * Sets path info variables when action's source change.
      * @param {String} source Current source of the action.
      */
-    _processSource: function(source) {
+    _processSource(source) {
       if (this._cancelSourceProcessing) {
         return;
       }
-      var parts = source.split('.');
+      const parts = source.split('.');
       this.source = parts[0] || '';
       this.sourceType = parts[1] || '';
       this.sourcePath = parts.splice(2).join('.');
-    },
+    }
 
-    _computeSourcePath: function(source, sourceType, sourcePath) {
+    _computeSourcePath(source, sourceType, sourcePath) {
       if (this._cancelSourceProcessing) {
         return;
       }
-      var path = source || '';
+      let path = source || '';
       if (sourceType) {
         path += '.' + sourceType;
       }
@@ -438,30 +444,30 @@ Custom property | Description | Default
       this._cancelSourceProcessing = true;
       this.set('action.source', path);
       this._cancelSourceProcessing = false;
-    },
+    }
     /**
      * Dispatches the `remove-action-item` custom event so the panel can remove
      * the item from the list.
      */
-    remove: function() {
-      this.fire('remove-action-item', null, {
+    remove() {
+      this.dispatchEvent(new CustomEvent('remove-action-item', {
         bubbles: false
-      });
-    },
+      }));
+    }
     // Computes if path input should be hidden.
-    _computePathHidden: function(sourceType) {
+    _computePathHidden(sourceType) {
       return sourceType === 'status';
-    },
+    }
     // Handler for add condition button click.
-    _appendCondition: function() {
+    _appendCondition() {
       this.addCondition();
-    },
+    }
     /**
      * Adds a condition to conditions list.
      *
      * @param {?Object} opts Optional model properties for the condition.
      */
-    addCondition: function(opts) {
+    addCondition(opts) {
       if (!opts) {
         opts = {};
       }
@@ -480,41 +486,41 @@ Custom property | Description | Default
       } else {
         this.push('action.conditions', model);
       }
-    },
+    }
     /**
      * Handles delete of the condition.
      */
-    _removeCondition: function(e) {
-      var index = e.model.get('index');
+    _removeCondition(e) {
+      const index = e.model.get('index');
       this.splice('action.conditions', index, 1);
-    },
+    }
     // Computes label for the action state enabler toggle button.
-    _computeActionStateLabel: function(enabled) {
+    _computeActionStateLabel(enabled) {
       return enabled ? 'enabled' : 'disabled';
-    },
-    _computeIteratorStateLabel: function(enabled) {
+    }
+    _computeIteratorStateLabel(enabled) {
       return enabled ? 'enabled' : 'disabled';
-    },
+    }
     // Computes label for toggle editor state button.
-    _computeToglePanelLabel: function(opened) {
+    _computeToglePanelLabel(opened) {
       return opened ? 'Hide editor' : 'Show editor';
-    },
+    }
     /**
      * Toggles opened state of the editor.
      */
-    toggleOpened: function() {
+    toggleOpened() {
       this.opened = !this.opened;
-    },
+    }
     /**
      * Computes label for the action lable when collapsed.
      * @param {String} action Currently selected action.
      * @return {String} Label for the action id.
      */
-    _computeActionLabel: function(action) {
+    _computeActionLabel(action) {
       return action === 'assign-variable' ? 'Assign variable' : 'Store variable';
-    },
+    }
 
-    _hasIteratorChanged: function(enabled) {
+    _hasIteratorChanged(enabled) {
       if (!enabled) {
         return;
       }
@@ -526,14 +532,25 @@ Custom property | Description | Default
         operator: 'equal',
         condition: ''
       });
-    },
+    }
 
-    _computeRenderIterator: function(source, sourceType) {
+    _computeRenderIterator(source, sourceType) {
       if (source === 'response' && sourceType === 'body') {
         return true;
       }
       return false;
     }
-  });
+
+    // /**
+    //  * Dispatches the `remove-action-item` custom event so the panel can remove
+    //  * the item from the list.
+    //  */
+    // remove() {
+    //   this.dispatchEvent(new CustomEvent('remove-action-item', {
+    //     bubbles: false
+    //   }));
+    // }
+  }
+  window.customElements.define(RequestActionEditor.is, RequestActionEditor);
   </script>
 </dom-module>

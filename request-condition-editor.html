@@ -11,7 +11,7 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../arc-icons/arc-icons.html">
@@ -20,8 +20,8 @@ the License.
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../paper-tooltip/paper-tooltip.html">
-<link rel="import" href="../condition-operator-dropdown/condition-operator-dropdown.html">
+<link rel="import" href="condition-operator-dropdown.html">
+
 <!--
 An editor for request / response editors.
 It creates data model that is accetable in ARC elements ecosystem for conditions.
@@ -113,8 +113,9 @@ Custom property | Description | Default
 `--inline-fom-action-icon-color` | Color of the delete icon | `rgba(0, 0, 0, 0.74)`
 `--inline-fom-action-icon-color-hover` | Color of the delete icon when hovering | `--accent-color` or `rgba(0, 0, 0, 0.74)`
 
-@group UI Elements
-@element request-actions-panel
+@polymer
+@customElement
+@memberof UiElements
 @demo demo/index.html
 -->
 <dom-module id="request-condition-editor">
@@ -185,13 +186,13 @@ Custom property | Description | Default
       <paper-toggle-button class="enable-button" checked="{{condition.enabled}}"></paper-toggle-button>
       <div class="form">
         <paper-dropdown-menu-light label="Source" dynamic-align class="source-main">
-          <paper-listbox class="dropdown-content" selected="{{source}}" attr-for-selected="value">
+          <paper-listbox slot="dropdown-content" selected="{{source}}" attr-for-selected="value">
             <paper-item value="request">Request</paper-item>
             <paper-item value="response">Response</paper-item>
           </paper-listbox>
         </paper-dropdown-menu-light>
         <paper-dropdown-menu-light label="Type" dynamic-align class="source-type">
-          <paper-listbox class="dropdown-content" selected="{{sourceType}}" attr-for-selected="value">
+          <paper-listbox slot="dropdown-content" selected="{{sourceType}}" attr-for-selected="value">
             <paper-item value="url">Url</paper-item>
             <paper-item value="status">Status code</paper-item>
             <paper-item value="headers">Headers</paper-item>
@@ -202,51 +203,52 @@ Custom property | Description | Default
         <condition-operator-dropdown class="condition-type" value="{{condition.operator}}" required></condition-operator-dropdown>
         <paper-input label="Condition value" required auto-validate value="{{condition.condition}}" class="condition"></paper-input>
       </div>
-      <span>
-        <paper-icon-button class="delete-icon" icon="arc:close" on-tap="remove"></paper-icon-button>
-        <paper-tooltip animation-delay="300">Remove condition</paper-tooltip>
-      </span>
+      <paper-icon-button class="delete-icon" icon="arc:close" on-tap="remove" title="Remove condition"></paper-icon-button>
     </div>
   </template>
   <script>
-  Polymer({
-    is: 'request-condition-editor',
-    properties: {
-      /**
-       * Definied condition.
-       */
-      condition: {
-        type: Object,
-        notify: true,
-        observer: '_conditionChanged'
-      },
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to source input field.
-       */
-      source: String,
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to source type input field.
-       */
-      sourceType: String,
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to path input field.
-       */
-      sourcePath: String
-    },
+  class RequestConditionEditor extends Polymer.Element {
+    static get is() { return 'request-condition-editor';}
+    static get properties() {
+      return {
+        /**
+         * Definied condition.
+         */
+        condition: {
+          type: Object,
+          notify: true,
+          observer: '_conditionChanged'
+        },
+        /**
+         * Value computed from the `action.source` property.
+         * Binded to source input field.
+         */
+        source: String,
+        /**
+         * Value computed from the `action.source` property.
+         * Binded to source type input field.
+         */
+        sourceType: String,
+        /**
+         * Value computed from the `action.source` property.
+         * Binded to path input field.
+         */
+        sourcePath: String
+      };
+    }
 
-    observers: ['_computeSourcePath(source,sourceType,sourcePath)'],
+    static get observers() {
+      return ['_computeSourcePath(source,sourceType,sourcePath)'];
+    }
     // Clears the path info.
-    clear: function() {
+    clear() {
       this.source = '';
       this.sourceType = '';
       this.sourcePath = '';
-    },
+    }
 
-    _conditionChanged: function(condition) {
-      var hasSource = condition && condition.source;
+    _conditionChanged(condition) {
+      const hasSource = condition && condition.source;
       if (hasSource) {
         this._cancelSourceProcessing = true;
       }
@@ -255,26 +257,26 @@ Custom property | Description | Default
         this._cancelSourceProcessing = false;
         this._processSource(condition.source);
       }
-    },
+    }
     /**
      * Sets path info variables when action's source change.
      * @param {String} source Current source of the action.
      */
-    _processSource: function(source) {
+    _processSource(source) {
       if (this._cancelSourceProcessing) {
         return;
       }
-      var parts = source.split('.');
+      const parts = source.split('.');
       this.source = parts[0] || '';
       this.sourceType = parts[1] || '';
       this.sourcePath = parts.splice(2).join('.');
-    },
+    }
 
-    _computeSourcePath: function(source, sourceType, sourcePath) {
+    _computeSourcePath(source, sourceType, sourcePath) {
       if (this._cancelSourceProcessing) {
         return;
       }
-      var path = source || '';
+      let path = source || '';
       if (sourceType) {
         path += '.' + sourceType;
       }
@@ -284,26 +286,26 @@ Custom property | Description | Default
       this._cancelSourceProcessing = true;
       this.set('condition.source', path);
       this._cancelSourceProcessing = false;
-    },
+    }
     /**
      * Dispatches the `remove-action-item` custom event so the panel can remove
      * the item from the list.
      */
-    remove: function() {
-      this.fire('remove-condition-item', null, {
+    remove() {
+      this.dispatchEvent(new CustomEvent('remove-condition-item', {
         bubbles: false
-      });
-    },
+      }));
+    }
     // Computes if path input should be hidden.
-    _computePathHidden: function(sourceType) {
+    _computePathHidden(sourceType) {
       return sourceType === 'status';
     }
-
     /**
      * Non bubbling event notifying parent element that this condition is
      * to be deleted.
      * @event remove-condition-item
      */
-  });
+  }
+  window.customElements.define(RequestConditionEditor.is, RequestConditionEditor);
   </script>
 </dom-module>

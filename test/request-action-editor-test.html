@@ -1,40 +1,20 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../request-action-editor.html">
   </head>
   <body>
-
     <test-fixture id="basic">
       <template>
         <request-action-editor></request-action-editor>
       </template>
     </test-fixture>
 
-    <test-fixture id="opened">
-      <template>
-        <request-action-editor opened></request-action-editor>
-      </template>
-    </test-fixture>
-
     <script>
-    /* global fixture, assert, MockInteractions, sinon, TestHelpers */
     suite('basic', function() {
       const config = {
         source: 'response.headers.content-type',
@@ -48,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           enabled: true
         }]
       };
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
         element.action = Object.assign({}, config);
@@ -70,10 +50,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isFalse(element._cancelSourceProcessing);
       });
 
-      test('opened is false by default', function() {
-        assert.isFalse(element.opened);
-      });
-
       test('Updates condition.source', function() {
         element.source = 'request';
         element.sourceType = 'url';
@@ -82,46 +58,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('source path input is visible', function() {
-        var elm = element.$$('.source-path');
-        var style = getComputedStyle(elm);
+        const elm = element.shadowRoot.querySelector('.source-path');
+        const style = getComputedStyle(elm);
         assert.notEqual(style.display, 'none');
       });
 
       test('Hides source path input', function() {
         element.sourceType = 'status';
-        var elm = element.$$('.source-path');
-        var style = getComputedStyle(elm);
+        const elm = element.shadowRoot.querySelector('.source-path');
+        const style = getComputedStyle(elm);
         assert.equal(style.display, 'none');
       });
 
-      test('Enable button is not rendered', function() {
-        TestHelpers.forceXIfStamp(element);
-        var elm = element.$$('.action-enabler');
-        assert.notOk(elm);
+      test('Enable button is not rendered', function(done) {
+        flush(() => {
+          const elm = element.shadowRoot.querySelector('.action-enabler');
+          assert.notOk(elm);
+          done();
+        });
       });
 
-      test('Info label is rendered', function() {
-        TestHelpers.forceXIfStamp(element);
-        var elm = element.$$('.short-info');
-        assert.ok(elm);
+      test('Info label is rendered', function(done) {
+        flush(() => {
+          const elm = element.shadowRoot.querySelector('.short-info');
+          assert.ok(elm);
+          done();
+        });
       });
 
-      test('Renders conditions', function() {
-        TestHelpers.forceXIfStamp(element);
-        var elm = element.$$('request-condition-editor');
-        assert.ok(elm);
+      test('Renders conditions', function(done) {
+        flush(() => {
+          const elm = element.shadowRoot.querySelector('request-condition-editor');
+          assert.ok(elm);
+          done();
+        });
       });
 
       test('Adds condition on button click', function() {
         assert.lengthOf(element.action.conditions, 1);
-        var button = element.$$('.add-condition');
-        MockInteractions.tap(button);
+        const button = element.shadowRoot.querySelector('.add-condition');
+        button.click();
         assert.lengthOf(element.action.conditions, 2);
       });
     });
 
     suite('_computeToglePanelLabel()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -138,7 +120,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('_computeActionStateLabel()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -155,7 +137,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('_computePathHidden()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -173,7 +155,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('_computeActionLabel()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -189,14 +171,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('addCondition()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
 
       test('Adds condition with default values', function() {
         element.addCondition();
-        var c = element.action.conditions[0];
+        const c = element.action.conditions[0];
         assert.equal(c.source, 'response.status');
         assert.equal(c.operator, 'equal');
         assert.equal(c.condition, 200);
@@ -211,7 +193,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           enabled: false
         };
         element.addCondition(data);
-        var c = element.action.conditions[0];
+        const c = element.action.conditions[0];
         assert.equal(c.source, data.source);
         assert.equal(c.operator, data.operator);
         assert.equal(c.condition, data.condition);
@@ -220,7 +202,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('Delete action', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -228,8 +210,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Dispatches remove-action-item custom event', function() {
         const spy = sinon.spy();
         element.addEventListener('remove-action-item', spy);
-        var button = element.$$('.remove-action');
-        MockInteractions.tap(button);
+        const button = element.shadowRoot.querySelector('.remove-action');
+        button.click();
         assert.isTrue(spy.calledOnce);
       });
 
@@ -244,8 +226,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('_removeCondition()', function() {
-      var element;
-      setup(function() {
+      let element;
+      setup(function(done) {
         element = fixture('basic');
         element.action = {
           source: 'response.headers.content-type',
@@ -259,27 +241,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             enabled: true
           }]
         };
-        TestHelpers.forceXIfStamp(element);
+        flush(() => done());
       });
 
       test('Removes condition from the list', function() {
-        var editor = element.$$('request-condition-editor');
+        const editor = element.shadowRoot.querySelector('request-condition-editor');
         editor.remove();
         assert.lengthOf(element.action.conditions, 0);
       });
 
-      test('Removes element from the dom', function() {
-        var editor = element.$$('request-condition-editor');
+      test('Removes element from the dom', function(done) {
+        const editor = element.shadowRoot.querySelector('request-condition-editor');
         editor.remove();
-        TestHelpers.forceXIfStamp(element);
-        editor = element.$$('request-condition-editor');
-        assert.notOk(editor);
+        flush(() => {
+          const editor = element.shadowRoot.querySelector('request-condition-editor');
+          assert.notOk(editor);
+          done();
+        });
       });
     });
 
     suite('Iterable editor', function() {
-      var element;
-      setup(function() {
+      let element;
+      setup(function(done) {
         element = fixture('basic');
         element.action = {
           source: 'response.body.value',
@@ -287,7 +271,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           destination: 'someValue',
           enabled: true
         };
-        TestHelpers.forceXIfStamp(element);
+        flush(() => done());
       });
 
       test('Computes _renderIterator', function() {
@@ -298,54 +282,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         assert.isUndefined(element.action.hasIterator);
       });
 
-      test('Hiddes the iterator toggle button', function() {
+      test('Hiddes the iterator toggle button', function(done) {
         element.sourceType = 'headers';
-        TestHelpers.forceXIfStamp(element);
-        assert.isFalse(element._renderIterator);
-        const toggle = element.$$('.iterator-enabler');
-        const style = getComputedStyle(toggle);
-        assert.equal(style.display, 'none');
+        flush(() => {
+          assert.isFalse(element._renderIterator);
+          const toggle = element.shadowRoot.querySelector('.iterator-enabler');
+          const style = getComputedStyle(toggle);
+          assert.equal(style.display, 'none');
+          done();
+        });
       });
 
-      test('Renders iterable editor', function() {
-        const toggle = element.$$('[data-action="iterable-toggle"]');
-        MockInteractions.tap(toggle);
-        TestHelpers.forceXIfStamp(element);
-        const editor = element.$$('request-action-iterator-editor');
-        assert.ok(editor);
+      test('Renders iterable editor', function(done) {
+        const toggle = element.shadowRoot.querySelector('[data-action="iterable-toggle"]');
+        toggle.click();
+        flush(() => {
+          const editor = element.shadowRoot.querySelector('request-action-iterator-editor');
+          assert.ok(editor);
+          done();
+        });
       });
 
       test('Creates default values', function() {
         element.set('action.hasIterator', true);
         assert.equal(element.action.iterator.source, 'data.*.property');
         assert.equal(element.action.iterator.operator, 'equal');
-      });
-    });
-
-    suite('Opened', function() {
-      var element;
-      setup(function() {
-        element = fixture('opened');
-        element.action = {
-          source: 'response.headers.content-type',
-          action: 'assign-variable',
-          destination: 'someValue',
-          enabled: true
-        };
-        TestHelpers.forceXIfStamp(element);
-      });
-
-      test('Enable button is rendered', function() {
-        TestHelpers.forceXIfStamp(element);
-        var elm = element.$$('.action-enabler');
-        assert.ok(elm);
-      });
-
-      test('Info label is not rendered', function() {
-        TestHelpers.forceXIfStamp(element);
-        var elm = element.$$('.short-info');
-        var style = getComputedStyle(elm);
-        assert.notEqual(style.display, 'none');
       });
     });
     </script>
