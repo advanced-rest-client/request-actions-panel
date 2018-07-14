@@ -381,6 +381,7 @@ Custom property | Description | Default
       const e = new CustomEvent('open-external-url', {
         bubbles: true,
         cancelable: true,
+        composed: true,
         detail: {
           url: url
         }
@@ -499,6 +500,7 @@ Custom property | Description | Default
       const e = new CustomEvent('variable-list', {
         bubbles: true,
         cancelable: true,
+        composed: true,
         detail: {}
       });
       this.dispatchEvent(e);
