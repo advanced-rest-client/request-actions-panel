@@ -22,6 +22,7 @@ the License.
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-combobox/paper-combobox.html">
 <link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="request-condition-editor.html">
 <link rel="import" href="request-action-iterator-editor.html">
 <!--
@@ -180,7 +181,6 @@ const config = {
 Custom property | Description | Default
 ----------------|-------------|----------
 `--request-action-editor` | Mixin applied to the element | `{}`
-`--request-action-editor-background-color` | Background color of the editor | `rgba(0, 162, 223, 0.05)`
 `--request-action-editor-closed-bar-height` | Height of the item when collapsed. | `48px`
 `--request-action-editor-closed-info-color` | Color of the collapsed info label | `rgba(0, 0, 0, 0.87)`
 
@@ -194,9 +194,9 @@ Custom property | Description | Default
     <style>
     :host {
       display: block;
-      background-color: var(--request-action-editor-background-color, rgba(0, 162, 223, 0.05));
       padding: 0 12px;
       margin: 12px 0;
+      @apply --shadow-elevation-3dp;
       @apply --arc-font-body1;
       @apply --request-action-editor;
     }
