@@ -203,7 +203,7 @@ Custom property | Description | Default
         <condition-operator-dropdown class="condition-type" value="{{condition.operator}}" required></condition-operator-dropdown>
         <paper-input label="Condition value" required auto-validate value="{{condition.condition}}" class="condition"></paper-input>
       </div>
-      <paper-icon-button class="delete-icon" icon="arc:close" on-tap="remove" title="Remove condition"></paper-icon-button>
+      <paper-icon-button class="delete-icon" icon="arc:close" on-click="remove" title="Remove condition"></paper-icon-button>
     </div>
   </template>
   <script>

@@ -293,8 +293,8 @@ Custom property | Description | Default
         </template>
       </span>
       <span>
-        <paper-button class="toggle-editor" on-tap="toggleOpened">[[_computeToglePanelLabel(opened)]]</paper-button>
-        <paper-button class="remove-action" on-tap="remove">Remove action</paper-button>
+        <paper-button class="toggle-editor" on-click="toggleOpened">[[_computeToglePanelLabel(opened)]]</paper-button>
+        <paper-button class="remove-action" on-click="remove">Remove action</paper-button>
       </span>
     </header>
     <iron-collapse opened="[[opened]]">
@@ -331,7 +331,7 @@ Custom property | Description | Default
           </div>
         </template>
         <div class="bottom-acctions">
-          <paper-button class="add-condition" on-tap="_appendCondition">Add condition</paper-button>
+          <paper-button class="add-condition" on-click="_appendCondition">Add condition</paper-button>
           <template is="dom-if" if="[[_renderIterator]]">
             <span class="iterator-enabler">
               <paper-toggle-button checked="{{action.hasIterator}}" data-action="iterable-toggle"></paper-toggle-button>

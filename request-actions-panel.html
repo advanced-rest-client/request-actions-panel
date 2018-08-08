@@ -278,37 +278,37 @@ Custom property | Description | Default
     <section class="request-actions-section">
       <header>
         <h3>Before request</h3>
-        <paper-icon-button class="help-button" icon="arc:help-outline" on-tap="_seekHelp"></paper-icon-button>
+        <paper-icon-button class="help-button" icon="arc:help-outline" on-click="_seekHelp"></paper-icon-button>
       </header>
       <template is="dom-if" if="[[!hasActions]]">
         <div class="empty-screen">
           <p class="info-header">Define actions to be performed <b>before</b> request start.</p>
-          <paper-button data-action="add-pre" raised class="action-button" on-tap="_addPreActionHandler">Create request action</paper-button>
+          <paper-button data-action="add-pre" raised class="action-button" on-click="_addPreActionHandler">Create request action</paper-button>
         </div>
       </template>
       <template is="dom-if" if="[[hasActions]]">
         <template is="dom-repeat" items="{{beforeActions.variables}}">
           <request-variable-editor action="{{item}}" variables-suggestions="[[variables]]" on-remove-action-item="_removePreItem"></request-variable-editor>
         </template>
-        <paper-button class="action-button" raised on-tap="_addPreActionHandler">Add request action</paper-button>
+        <paper-button class="action-button" raised on-click="_addPreActionHandler">Add request action</paper-button>
       </template>
     </section>
     <section class="response-actions-section">
       <header>
         <h3>After response</h3>
-        <paper-icon-button class="help-button" icon="arc:help-outline" on-tap="_seekHelp"></paper-icon-button>
+        <paper-icon-button class="help-button" icon="arc:help-outline" on-click="_seekHelp"></paper-icon-button>
       </header>
       <template is="dom-if" if="[[!hasActions]]">
         <div class="empty-screen">
           <p class="info-header">Define actions to be performed when <b>response is ready</b>.</p>
-          <paper-button data-action="add-post" raised class="action-button" on-tap="_addPostActionHandler">Create response action</paper-button>
+          <paper-button data-action="add-post" raised class="action-button" on-click="_addPostActionHandler">Create response action</paper-button>
         </div>
       </template>
       <template is="dom-if" if="[[hasActions]]">
         <template is="dom-repeat" items="{{afterActions}}">
           <request-action-editor action="{{item}}" variables-suggestions="[[variables]]" opened on-remove-action-item="_removePostItem"></request-action-editor>
         </template>
-        <paper-button class="action-button" raised on-tap="_addPostActionHandler">Add response action</paper-button>
+        <paper-button class="action-button" raised on-click="_addPostActionHandler">Add response action</paper-button>
       </template>
     </section>
   </template>

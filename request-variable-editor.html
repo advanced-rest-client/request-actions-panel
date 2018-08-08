@@ -44,7 +44,7 @@ the License.
       <paper-toggle-button class="enable-button" checked="{{action.enabled}}"></paper-toggle-button>
       <paper-combobox label="Variable name" required auto-validate value="{{action.variable}}" source="[[variablesSuggestions]]"></paper-combobox>
       <paper-input label="Variable value" value="{{action.value}}"></paper-input>
-      <paper-icon-button icon="arc:clear" on-tap="remove" title="Remove request action"></paper-icon-button>
+      <paper-icon-button icon="arc:clear" on-click="remove" title="Remove request action"></paper-icon-button>
     </div>
   </template>
   <script>
