@@ -178,14 +178,14 @@ Custom property | Description | Default
       <p>Iterate over arrays and objects in response body to trigger the action on maching object. Add <code>*</code> symbol for iterable object</p>
     </div>
     <div class="form">
-      <paper-input label="Path to data (optional)" value="{{iterator.source}}" class="source-path" required></paper-input>
-      <condition-operator-dropdown class="condition-type" value="{{iterator.operator}}" required></condition-operator-dropdown>
-      <paper-input label="Condition value" required auto-validate value="{{iterator.condition}}" class="condition" required></paper-input>
+      <paper-input label="Path to data (optional)" value="{{iterator.source}}" class="source-path" required disabled="[[readonly]]"></paper-input>
+      <condition-operator-dropdown class="condition-type" value="{{iterator.operator}}" required readonly="[[readonly]]"></condition-operator-dropdown>
+      <paper-input label="Condition value" required auto-validate value="{{iterator.condition}}" class="condition" required disabled="[[readonly]]"></paper-input>
     </div>
   </template>
   <script>
   class RequestActionIteratorEditor extends Polymer.Element {
-    static get is() { return 'request-action-iterator-editor';}
+    static get is() {return 'request-action-iterator-editor';}
     static get properties() {
       return {
         /**
@@ -194,7 +194,11 @@ Custom property | Description | Default
         iterator: {
           type: Object,
           notify: true
-        }
+        },
+        /**
+         * Renders the editor in read only mode
+         */
+        readonly: Boolean
       };
     }
   }

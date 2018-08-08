@@ -183,15 +183,15 @@ Custom property | Description | Default
     }
     </style>
     <div class="container">
-      <paper-toggle-button class="enable-button" checked="{{condition.enabled}}"></paper-toggle-button>
+      <paper-toggle-button class="enable-button" checked="{{condition.enabled}}" disabled="[[readonly]]"></paper-toggle-button>
       <div class="form">
-        <paper-dropdown-menu-light label="Source" dynamic-align class="source-main">
+        <paper-dropdown-menu-light label="Source" dynamic-align class="source-main" disabled="[[readonly]]">
           <paper-listbox slot="dropdown-content" selected="{{source}}" attr-for-selected="value">
             <paper-item value="request">Request</paper-item>
             <paper-item value="response">Response</paper-item>
           </paper-listbox>
         </paper-dropdown-menu-light>
-        <paper-dropdown-menu-light label="Type" dynamic-align class="source-type">
+        <paper-dropdown-menu-light label="Type" dynamic-align class="source-type" disabled="[[readonly]]">
           <paper-listbox slot="dropdown-content" selected="{{sourceType}}" attr-for-selected="value">
             <paper-item value="url">Url</paper-item>
             <paper-item value="status">Status code</paper-item>
@@ -199,16 +199,16 @@ Custom property | Description | Default
             <paper-item value="body">Body</paper-item>
           </paper-listbox>
         </paper-dropdown-menu-light>
-        <paper-input label="Path to data (optional)" value="{{sourcePath}}" class="source-path" hidden$="[[_computePathHidden(sourceType)]]"></paper-input>
-        <condition-operator-dropdown class="condition-type" value="{{condition.operator}}" required></condition-operator-dropdown>
-        <paper-input label="Condition value" required auto-validate value="{{condition.condition}}" class="condition"></paper-input>
+        <paper-input label="Path to data (optional)" value="{{sourcePath}}" class="source-path" hidden$="[[_computePathHidden(sourceType)]]" disabled="[[readonly]]"></paper-input>
+        <condition-operator-dropdown class="condition-type" value="{{condition.operator}}" required readonly="[[readonly]]"></condition-operator-dropdown>
+        <paper-input label="Condition value" required auto-validate value="{{condition.condition}}" class="condition" disabled="[[readonly]]"></paper-input>
       </div>
       <paper-icon-button class="delete-icon" icon="arc:close" on-click="remove" title="Remove condition"></paper-icon-button>
     </div>
   </template>
   <script>
   class RequestConditionEditor extends Polymer.Element {
-    static get is() { return 'request-condition-editor';}
+    static get is() {return 'request-condition-editor';}
     static get properties() {
       return {
         /**
@@ -233,7 +233,11 @@ Custom property | Description | Default
          * Value computed from the `action.source` property.
          * Binded to path input field.
          */
-        sourcePath: String
+        sourcePath: String,
+        /**
+         * Renders the editor in read only mode
+         */
+        readonly: Boolean
       };
     }
 

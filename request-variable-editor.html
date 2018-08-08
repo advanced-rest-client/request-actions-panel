@@ -41,10 +41,10 @@ the License.
     }
     </style>
     <div class="item">
-      <paper-toggle-button class="enable-button" checked="{{action.enabled}}"></paper-toggle-button>
-      <paper-combobox label="Variable name" required auto-validate value="{{action.variable}}" source="[[variablesSuggestions]]"></paper-combobox>
-      <paper-input label="Variable value" value="{{action.value}}"></paper-input>
-      <paper-icon-button icon="arc:clear" on-click="remove" title="Remove request action"></paper-icon-button>
+      <paper-toggle-button class="enable-button" checked="{{action.enabled}}" disabled="[[readonly]]"></paper-toggle-button>
+      <paper-combobox label="Variable name" required auto-validate value="{{action.variable}}" source="[[variablesSuggestions]]" readonly="[[readonly]]"></paper-combobox>
+      <paper-input label="Variable value" value="{{action.value}}" disabled="[[readonly]]"></paper-input>
+      <paper-icon-button icon="arc:clear" on-click="remove" title="Remove request action" disabled="[[readonly]]"></paper-icon-button>
     </div>
   </template>
   <script>
@@ -66,7 +66,7 @@ the License.
    * @demo demo/index.html
    */
   class RequestVariableEditor extends Polymer.Element {
-    static get is() { return 'request-variable-editor';}
+    static get is() {return 'request-variable-editor';}
     static get properties() {
       return {
         /**
@@ -79,7 +79,11 @@ the License.
         /**
          * List of variables sugesstions to display in the combo box.
          */
-        variablesSuggestions: Array
+        variablesSuggestions: Array,
+        /**
+         * Renders the editor in read only mode
+         */
+        readonly: Boolean
       };
     }
     /**

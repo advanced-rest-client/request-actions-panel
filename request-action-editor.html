@@ -278,11 +278,20 @@ Custom property | Description | Default
       @apply --layout-horizontal;
       @apply --layout-center;
     }
+
+    paper-button[disabled] {
+      background: none !important;
+      color: #a8a8a8 !important;
+    }
+
+    paper-button[raised][disabled] {
+      background: #eaeaea !important;
+    }
     </style>
     <header>
       <template is="dom-if" if="[[opened]]">
         <span class="action-enabler">
-          <paper-toggle-button class="enable-button" checked="{{action.enabled}}"></paper-toggle-button>
+          <paper-toggle-button class="enable-button" checked="{{action.enabled}}" disabled="[[readonly]]"></paper-toggle-button>
           Action [[_computeActionStateLabel(action.enabled)]]
         </span>
       </template>
@@ -294,19 +303,19 @@ Custom property | Description | Default
       </span>
       <span>
         <paper-button class="toggle-editor" on-click="toggleOpened">[[_computeToglePanelLabel(opened)]]</paper-button>
-        <paper-button class="remove-action" on-click="remove">Remove action</paper-button>
+        <paper-button class="remove-action" on-click="remove" disabled="[[readonly]]">Remove action</paper-button>
       </span>
     </header>
     <iron-collapse opened="[[opened]]">
       <div class="form">
         <div class="action-form">
-          <paper-dropdown-menu-light label="Source" dynamic-align class="source-main">
+          <paper-dropdown-menu-light label="Source" dynamic-align class="source-main" disabled="[[readonly]]">
             <paper-listbox slot="dropdown-content" selected="{{source}}" attr-for-selected="value">
               <paper-item value="request">Request</paper-item>
               <paper-item value="response">Response</paper-item>
             </paper-listbox>
           </paper-dropdown-menu-light>
-          <paper-dropdown-menu-light label="Type" dynamic-align class="source-type">
+          <paper-dropdown-menu-light label="Type" dynamic-align class="source-type" disabled="[[readonly]]">
             <paper-listbox slot="dropdown-content" selected="{{sourceType}}" attr-for-selected="value">
               <paper-item value="url">Url</paper-item>
               <paper-item value="status">Status code</paper-item>
@@ -314,40 +323,40 @@ Custom property | Description | Default
               <paper-item value="body">Body</paper-item>
             </paper-listbox>
           </paper-dropdown-menu-light>
-          <paper-input label="Path to data (optional)" value="{{sourcePath}}" class="source-path" hidden$="[[_computePathHidden(sourceType)]]"></paper-input>
-          <paper-dropdown-menu-light label="Action type" dynamic-align class="action-type">
+          <paper-input label="Path to data (optional)" value="{{sourcePath}}" class="source-path" hidden$="[[_computePathHidden(sourceType)]]" disabled="[[readonly]]"></paper-input>
+          <paper-dropdown-menu-light label="Action type" dynamic-align class="action-type" disabled="[[readonly]]">
             <paper-listbox slot="dropdown-content" selected="{{action.action}}" attr-for-selected="value">
               <paper-item value="assign-variable">Assign variable</paper-item>
               <paper-item value="store-variable">Store variable</paper-item>
             </paper-listbox>
           </paper-dropdown-menu-light>
-          <paper-combobox label="Variable name" required auto-validate value="{{action.destination}}" class="destination" source="[[variablesSuggestions]]"></paper-combobox>
+          <paper-combobox label="Variable name" required auto-validate value="{{action.destination}}" class="destination" source="[[variablesSuggestions]]" disabled="[[readonly]]"></paper-combobox>
         </div>
         <template is="dom-if" if="[[action.conditions]]">
           <div class="conditions-form">
             <template is="dom-repeat" items="{{action.conditions}}">
-              <request-condition-editor condition="{{item}}" on-remove-condition-item="_removeCondition"></request-condition-editor>
+              <request-condition-editor condition="{{item}}" on-remove-condition-item="_removeCondition" readonly="[[readonly]]"></request-condition-editor>
             </template>
           </div>
         </template>
         <div class="bottom-acctions">
-          <paper-button class="add-condition" on-click="_appendCondition">Add condition</paper-button>
+          <paper-button class="add-condition" on-click="_appendCondition" disabled="[[readonly]]">Add condition</paper-button>
           <template is="dom-if" if="[[_renderIterator]]">
             <span class="iterator-enabler">
-              <paper-toggle-button checked="{{action.hasIterator}}" data-action="iterable-toggle"></paper-toggle-button>
+              <paper-toggle-button checked="{{action.hasIterator}}" data-action="iterable-toggle" disabled="[[readonly]]"></paper-toggle-button>
               Iterator [[_computeIteratorStateLabel(action.hasIterator)]]
             </span>
           </template>
         </div>
         <template is="dom-if" if="[[action.hasIterator]]">
-          <request-action-iterator-editor iterator="{{action.iterator}}"></request-action-iterator-editor>
+          <request-action-iterator-editor iterator="{{action.iterator}}" readonly="[[readonly]]"></request-action-iterator-editor>
         </template>
       </div>
     </iron-collapse>
   </template>
   <script>
   class RequestActionEditor extends Polymer.Element {
-    static get is() { return 'request-action-editor';}
+    static get is() {return 'request-action-editor';}
     static get properties() {
       return {
         /**
@@ -387,7 +396,11 @@ Custom property | Description | Default
         _renderIterator: {
           type: Boolean,
           computed: '_computeRenderIterator(source,sourceType)'
-        }
+        },
+        /**
+         * Renders the editor in read only mode
+         */
+        readonly: Boolean
       };
     }
 
@@ -489,6 +502,7 @@ Custom property | Description | Default
     }
     /**
      * Handles delete of the condition.
+     * @param {CustomEvent} e
      */
     _removeCondition(e) {
       const index = e.model.get('index');

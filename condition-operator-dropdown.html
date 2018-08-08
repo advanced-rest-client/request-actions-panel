@@ -29,7 +29,7 @@ the License.
       @apply --condition-operator-dropdown-menu;
     }
     </style>
-    <paper-dropdown-menu label="Operator" dynamic-align class="condition-type" name="[[name]]" required$="[[required]]">
+    <paper-dropdown-menu label="Operator" dynamic-align class="condition-type" name="[[name]]" required$="[[required]]" disabled="[[readonly]]">
       <paper-listbox slot="dropdown-content" selected="{{value}}" attr-for-selected="value">
         <paper-item value="equal">Equal</paper-item>
         <paper-item value="not-equal">Not equal</paper-item>
@@ -65,7 +65,16 @@ the License.
    */
   class ConditionOperatorDropdown extends
     Polymer.mixinBehaviors([Polymer.IronFormElementBehavior], Polymer.Element) {
-    static get is() { return 'condition-operator-dropdown';}
+    static get is() {return 'condition-operator-dropdown';}
+
+    static get properties() {
+      return {
+        /**
+         * Renders the editor in read only mode
+         */
+        readonly: Boolean
+      };
+    }
   }
   window.customElements.define(ConditionOperatorDropdown.is, ConditionOperatorDropdown);
   </script>
