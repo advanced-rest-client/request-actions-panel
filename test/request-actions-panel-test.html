@@ -36,6 +36,27 @@
           variable: 'test-var'
         }]
       };
+
+      let envCurrFn;
+      suiteSetup(() => {
+        envCurrFn = (e) => {
+          e.preventDefault();
+          e.detail.environment = 'default';
+          e.detail.variables = [{
+            enabled: true,
+            variable: 'enabled'
+          }, {
+            enabled: false,
+            variable: 'disabled'
+          }];
+        };
+        window.addEventListener('environment-current', envCurrFn);
+      });
+
+      suiteTeardown(() => {
+        window.removeEventListener('environment-current', envCurrFn);
+      });
+
       let element;
 
       test('hasActions is false', function() {
@@ -43,38 +64,14 @@
         assert.isFalse(element.hasActions);
       });
 
-      test('Queries for variables list', function(done) {
+      test('Sets variables list', function() {
         element = fixture('basic');
-        element.addEventListener('variable-list', function clb() {
-          element.removeEventListener('variable-list', clb);
-          done();
-        });
+        assert.typeOf(element.variables, 'array');
       });
 
-      test('Sets variables list', function(done) {
+      test('Filters variables', function() {
         element = fixture('basic');
-        element.addEventListener('variable-list', function clb(e) {
-          element.removeEventListener('variable-list', clb);
-          e.preventDefault();
-          e.detail.value = [{variable: 'test'}];
-          setTimeout(function() {
-            assert.lengthOf(element.variables, 1);
-            done();
-          }, 5);
-        });
-      });
-
-      test('Filters variables', function(done) {
-        element = fixture('basic');
-        element.addEventListener('variable-list', function clb(e) {
-          element.removeEventListener('variable-list', clb);
-          e.preventDefault();
-          e.detail.value = [{variable: 'test', enabled: false}];
-          setTimeout(function() {
-            assert.lengthOf(element.variables, 0);
-            done();
-          }, 5);
-        });
+        assert.equal(element.variables[0].variable, 'enabled');
       });
 
       test('Computes hasPostActions', function() {

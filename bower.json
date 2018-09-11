@@ -30,7 +30,8 @@
     "paper-combobox": "advanced-rest-client/paper-combobox#^2.0.0",
     "paper-toggle-button": "PolymerElements/paper-toggle-button#^2.0.0",
     "iron-collapse": "PolymerElements/iron-collapse#^2.0.0",
-    "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#^2.0.0"
+    "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#^2.0.0",
+    "variables-consumer-mixin": "advanced-rest-client/variables-consumer-mixin#2.0.0-preview"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.1",
