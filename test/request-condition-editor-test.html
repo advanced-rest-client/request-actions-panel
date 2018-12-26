@@ -1,22 +1,10 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
     <link rel="import" href="../request-condition-editor.html">
   </head>
   <body>
@@ -28,14 +16,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global fixture, assert, MockInteractions, sinon */
     suite('basic', function() {
       const config = {
         source: 'response.headers.content-type',
         operator: 'equal',
         condition: 200
       };
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
         element.condition = Object.assign({}, config);
@@ -65,21 +52,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       });
 
       test('source path input is visible', function() {
-        var elm = element.$$('.source-path');
-        var style = getComputedStyle(elm);
+        const elm = element.shadowRoot.querySelector('.source-path');
+        const style = getComputedStyle(elm);
         assert.notEqual(style.display, 'none');
       });
 
       test('Hides source path input', function() {
         element.sourceType = 'status';
-        var elm = element.$$('.source-path');
-        var style = getComputedStyle(elm);
+        const elm = element.shadowRoot.querySelector('.source-path');
+        const style = getComputedStyle(elm);
         assert.equal(style.display, 'none');
       });
     });
 
     suite('_computePathHidden()', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -97,7 +84,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     });
 
     suite('Delete condition', function() {
-      var element;
+      let element;
       setup(function() {
         element = fixture('basic');
       });
@@ -105,8 +92,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       test('Dispatches remove-condition-item custom event', function() {
         const spy = sinon.spy();
         element.addEventListener('remove-condition-item', spy);
-        var button = element.$$('.delete-icon');
-        MockInteractions.tap(button);
+        const button = element.shadowRoot.querySelector('.delete-icon');
+        button.click();
         assert.isTrue(spy.calledOnce);
       });
 
@@ -117,6 +104,85 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           done();
         });
         element.remove();
+      });
+    });
+
+    suite('_processSource()', () => {
+      let element;
+      const path = 'a.b.c.d';
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Does nothing when _cancelSourceProcessing is set', () => {
+        element._cancelSourceProcessing = true;
+        element._processSource(path);
+        assert.isUndefined(element.source);
+      });
+
+      test('Sets "source" property', () => {
+        element._cancelSourceProcessing = false;
+        element._processSource(path);
+        assert.equal(element.source, 'a');
+      });
+
+      test('Sets "sourceType" property', () => {
+        element._processSource(path);
+        assert.equal(element.sourceType, 'b');
+      });
+
+      test('Sets "sourcePath" property', () => {
+        element._processSource(path);
+        assert.equal(element.sourcePath, 'c.d');
+      });
+
+      test('Sets defaults', () => {
+        element._processSource('');
+        assert.equal(element.source, '');
+        assert.equal(element.sourceType, '');
+        assert.equal(element.sourcePath, '');
+      });
+    });
+
+    suite('_computeSourcePath()', () => {
+      let element;
+      const source = 'a';
+      const sourceType = 'b';
+      const sourcePath = 'c.d';
+      const config = {
+        source: 'response.headers.content-type',
+        operator: 'equal',
+        condition: 200
+      };
+      setup(function() {
+        element = fixture('basic');
+        element.condition = Object.assign({}, config);
+      });
+
+      test('Does nothing when _cancelSourceProcessing is set', () => {
+        element._cancelSourceProcessing = true;
+        element._computeSourcePath(source, sourceType, sourcePath);
+        assert.equal(element.condition.source, 'response.headers.content-type');
+      });
+
+      test('Sets full path', () => {
+        element._computeSourcePath(source, sourceType, sourcePath);
+        assert.equal(element.condition.source, 'a.b.c.d');
+      });
+
+      test('Uses default value for source', () => {
+        element._computeSourcePath(undefined, sourceType, sourcePath);
+        assert.equal(element.condition.source, '.b.c.d');
+      });
+
+      test('Skips type', () => {
+        element._computeSourcePath(source, undefined, sourcePath);
+        assert.equal(element.condition.source, 'a.c.d');
+      });
+
+      test('Skips path', () => {
+        element._computeSourcePath(source, sourceType, undefined);
+        assert.equal(element.condition.source, 'a.b');
       });
     });
     </script>
