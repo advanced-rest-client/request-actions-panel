@@ -1,3 +1,28 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.10...2.0.0) (2018-12-26)
+
+
+### Breaking
+
+* Upgrading component to Polymer 2 ([21394201ec15a8225d71174d5c315fd077cf9fbc](https://github.com/advanced-rest-client/request-actions-panel/commit/21394201ec15a8225d71174d5c315fd077cf9fbc))
+
+### Fix
+
+* Fixing custom event dispatch ([e98bd3a766fe19648708d099da34a14717eb9864](https://github.com/advanced-rest-client/request-actions-panel/commit/e98bd3a766fe19648708d099da34a14717eb9864))
+* Fixing sauce labs configuration ([2db3a0ac52c328ec583b079173822ff286851fd3](https://github.com/advanced-rest-client/request-actions-panel/commit/2db3a0ac52c328ec583b079173822ff286851fd3))
+
+### New
+
+* Adding support for `readonly` attribute ([f53e22ac23b610e24361dda52bf09e4366db646f](https://github.com/advanced-rest-client/request-actions-panel/commit/f53e22ac23b610e24361dda52bf09e4366db646f))
+
+### Update
+
+* Replacing `on-tap` with `on-click` ([cda92a2468ec3beaddbe22f04b2ea2882e0eafbb](https://github.com/advanced-rest-client/request-actions-panel/commit/cda92a2468ec3beaddbe22f04b2ea2882e0eafbb))
+* Updated styling ([ddd674a1112fdbf2f337aa23c1c1b29bf8d5ca74](https://github.com/advanced-rest-client/request-actions-panel/commit/ddd674a1112fdbf2f337aa23c1c1b29bf8d5ca74))
+* Updating to new variables API ([8d3784c79b49a73b3ef6b8f4d68bc6c7cff85bc5](https://github.com/advanced-rest-client/request-actions-panel/commit/8d3784c79b49a73b3ef6b8f4d68bc6c7cff85bc5))
+
+
+
 <a name="0.1.11"></a>
 ## [0.1.11](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.10...0.1.11) (2018-02-16)
 
