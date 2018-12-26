@@ -402,6 +402,9 @@ the License.
 
     /**
      * Opens documentation page for the module.
+     *
+     * @return {Window|undefined} reference to newly created window if not
+     * handled by `open-external-url` event.
      */
     _seekHelp() {
       let url = 'https://github.com/advanced-rest-client/';
@@ -418,7 +421,7 @@ the License.
       if (e.defaultPrevented) {
         return;
       }
-      window.open(url);
+      return window.open(url);
     }
     /**
      * Computes value for `hasPostActions` based on post actions.

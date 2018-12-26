@@ -481,7 +481,11 @@ the License.
         path += '.' + sourcePath;
       }
       this._cancelSourceProcessing = true;
-      this.set('action.source', path);
+      if (!this.action) {
+        this.set('action', {source: path});
+      } else {
+        this.set('action.source', path);
+      }
       this._cancelSourceProcessing = false;
     }
     /**

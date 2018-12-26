@@ -172,6 +172,23 @@
         assert.equal(a.destination, data.destination);
         assert.equal(a.enabled, data.enabled);
       });
+
+      test('Adds condition to existing list', function() {
+        const data = {
+          source: 'response.body',
+          action: 'store-variable',
+          destination: 'test',
+          enabled: false
+        };
+        element.afterActions = [{
+          source: 'request.url',
+          action: 'store-variable',
+          destination: 'test',
+          enabled: true
+        }];
+        element.addPostAction(data);
+        assert.lengthOf(element.afterActions, 2);
+      });
     });
 
     suite('addPreAction()', function() {
@@ -199,6 +216,173 @@
         assert.equal(a.variable, data.variable);
         assert.equal(a.value, data.value);
         assert.equal(a.enabled, data.enabled);
+      });
+
+      test('Adds condition to existing list', function() {
+        const data = {
+          source: 'response.body',
+          action: 'store-variable',
+          destination: 'test',
+          enabled: false
+        };
+        element.beforeActions = {
+          variables: [{
+            source: 'response.body',
+            action: 'store-variable',
+            destination: 'test',
+            enabled: false
+          }]
+        };
+        element.addPreAction(data);
+        assert.lengthOf(element.beforeActions.variables, 2);
+      });
+    });
+
+    suite('_seekHelp()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Dispatches open-external-url event', () => {
+        let called = false;
+        element.addEventListener('open-external-url', function f(e) {
+          element.removeEventListener('open-external-url', f);
+          called = true;
+          e.preventDefault();
+        });
+        element._seekHelp();
+        assert.isTrue(called);
+      });
+
+      test('Opens window when event not handled', () => {
+        const result = element._seekHelp();
+        if (result === null) {
+          // popup blocked
+          return;
+        }
+        assert.ok(result);
+        result.close();
+      });
+    });
+
+    suite('_processVariables()', () => {
+      let element;
+      setup(function() {
+        element = fixture('basic');
+      });
+
+      test('Returns undefined when no argument', () => {
+        const result = element._processVariables();
+        assert.isUndefined(result);
+      });
+
+      test('Returns undefined when no base', () => {
+        const result = element._processVariables({});
+        assert.isUndefined(result);
+      });
+
+      test('Returns undefined when variables', () => {
+        const result = element._processVariables({base: []});
+        assert.isUndefined(result);
+      });
+
+      test('Returns list of enabled variables', () => {
+        const result = element._processVariables({
+          base: [{
+            variable: 'a',
+            enabled: true
+          }, {
+            variable: 'b',
+            enabled: false
+          }]
+        });
+        assert.typeOf(result, 'array');
+        assert.lengthOf(result, 1);
+        assert.equal(result[0], 'a');
+      });
+    });
+
+    suite('_removePreItem()', () => {
+      const variables = [{
+        enabled: true,
+        value: 'test-value',
+        variable: 'test-var'
+      }];
+
+      let element;
+      setup(function() {
+        element = fixture('basic');
+        element.beforeActions = {
+          variables: Array.from(variables)
+        };
+      });
+
+      test('Removes action at position', () => {
+        element.beforeActions.variables.push({
+          enabled: true,
+          value: 'test-value',
+          variable: 'other-var'
+        });
+        element._removePreItem({
+          model: {
+            get: () => 0
+          }
+        });
+        assert.lengthOf(element.beforeActions.variables, 1, 'Has one item left');
+        const item = element.beforeActions.variables[0];
+        assert.equal(item.variable, 'other-var', 'Left right item');
+      });
+
+      test('Sets beforeActions undefined if nothing left', () => {
+        element._removePreItem({
+          model: {
+            get: () => 0
+          }
+        });
+        assert.isUndefined(element.beforeActions);
+      });
+    });
+
+    suite('_removePostItem()', () => {
+      const afterActions = [{
+        source: 'response.headers.content-type',
+        action: 'assign-variable',
+        destination: 'someValue',
+        enabled: true,
+        conditions: []
+      }];
+      let element;
+      setup(function() {
+        element = fixture('basic');
+        element.afterActions = Array.from(afterActions);
+      });
+
+      test('Removes action at position', () => {
+        element.afterActions.push({
+          source: 'request.headers',
+          action: 'assign-variable',
+          destination: 'other',
+          enabled: true,
+          conditions: []
+        });
+        element._removePostItem({
+          model: {
+            get: () => 0
+          }
+        });
+        assert.lengthOf(element.afterActions, 1, 'Has one item left');
+        const item = element.afterActions[0];
+        assert.equal(item.source, 'request.headers', 'Left right item');
+      });
+
+      test('Sets afterActions undefined if nothing left', () => {
+        element._removePostItem({
+          model: {
+            get: () => 0
+          }
+        });
+        assert.isUndefined(element.afterActions);
       });
     });
     </script>
