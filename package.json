@@ -1,5 +1,5 @@
 {
-  "name": "request-actions-panel",
+  "name": "@advanced-rest-client/request-actions-panel",
   "version": "2.0.0",
   "license": "Apache-2.0",
   "description": "A panel to define request actions",
