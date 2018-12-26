@@ -19,11 +19,7 @@ the License.
 <link rel="import" href="../variables-consumer-mixin/variables-consumer-mixin.html">
 <link rel="import" href="request-action-editor.html">
 <link rel="import" href="request-variable-editor.html">
-<!--
 
-
-
--->
 <dom-module id="request-actions-panel">
   <template>
     <style>
@@ -78,16 +74,16 @@ the License.
     .request-actions-section {
       margin-bottom: 20px;
       padding-bottom: 20px;
-      border-bottom: 1px #BDBDBD solid;
+      border-bottom: 1px var(--request-actions-panel-section-border-bottom-color, #BDBDBD) solid;
     }
 
     paper-button[disabled] {
       background: none !important;
-      color: #a8a8a8 !important;
+      color: var(--request-actions-panel-disabled-button-color, #a8a8a8) !important;
     }
 
     paper-button[raised][disabled] {
-      background: #eaeaea !important;
+      background: var(--request-actions-panel-disabled-button-raised-color, #eaeaea) !important;
     }
     </style>
     <section class="request-actions-section">
