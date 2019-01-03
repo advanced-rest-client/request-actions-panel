@@ -1,7 +1,7 @@
 {
   "name": "request-actions-panel",
   "description": "A panel to define request actions",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "Apache-2.0",
   "authors": [
     "Pawel Psztyc",
@@ -31,14 +31,14 @@
     "paper-toggle-button": "PolymerElements/paper-toggle-button#^2.0.0",
     "iron-collapse": "PolymerElements/iron-collapse#^2.0.0",
     "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#^2.0.0",
-    "variables-consumer-mixin": "advanced-rest-client/variables-consumer-mixin#2.0.0-preview"
+    "variables-consumer-mixin": "advanced-rest-client/variables-consumer-mixin#^2.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.1",
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "variables-manager": "advanced-rest-client/variables-manager#2.0.0-preview",
+    "variables-manager": "advanced-rest-client/variables-manager#^2.0.0",
     "app-pouchdb": "PolymerElements/app-pouchdb#^2.1.1",
     "web-animations-js": "web-animations/web-animations-js#^2.3"
   },
