@@ -5,23 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   request-condition-editor.html
+ *   request-condition-editor.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../paper-icon-button/paper-icon-button.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-toggle-button/paper-toggle-button.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu-light.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../paper-item/paper-item.d.ts" />
-/// <reference path="condition-operator-dropdown.d.ts" />
 
 declare namespace UiElements {
 
@@ -116,7 +105,7 @@ declare namespace UiElements {
    * `--inline-fom-action-icon-color` | Color of the delete icon | `rgba(0, 0, 0, 0.74)`
    * `--inline-fom-action-icon-color-hover` | Color of the delete icon when hovering | `--accent-color` or `rgba(0, 0, 0, 0.74)`
    */
-  class RequestConditionEditor extends Polymer.Element {
+  class RequestConditionEditor extends PolymerElement {
 
     /**
      * Definied condition.
@@ -173,6 +162,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "request-condition-editor": UiElements.RequestConditionEditor;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "request-condition-editor": UiElements.RequestConditionEditor;
+  }
 }
+
+export {};

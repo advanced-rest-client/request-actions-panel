@@ -5,21 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   request-actions-panel.html
+ *   request-actions-panel.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../paper-icon-button/paper-icon-button.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../variables-consumer-mixin/variables-consumer-mixin.d.ts" />
-/// <reference path="request-action-editor.d.ts" />
-/// <reference path="request-variable-editor.d.ts" />
 
 declare namespace UiElements {
 
@@ -239,7 +230,7 @@ declare namespace UiElements {
    * `--request-actions-panel-empty-screen-color` | Color of the empty screen | `#707070`
    */
   class RequestActionsPanel extends
-    ArcComponents.VariablesConsumerMixin(
+    VariablesConsumerMixin(
     Object) {
 
     /**
@@ -333,6 +324,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "request-actions-panel": UiElements.RequestActionsPanel;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "request-actions-panel": UiElements.RequestActionsPanel;
+  }
 }
+
+export {};

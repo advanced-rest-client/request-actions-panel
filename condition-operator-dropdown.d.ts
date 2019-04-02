@@ -5,18 +5,11 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   condition-operator-dropdown.html
+ *   condition-operator-dropdown.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/legacy/class.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../paper-item/paper-item.d.ts" />
-/// <reference path="../iron-form-element-behavior/iron-form-element-behavior.d.ts" />
 
 declare namespace UiElements {
 
@@ -45,6 +38,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "condition-operator-dropdown": UiElements.ConditionOperatorDropdown;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "condition-operator-dropdown": UiElements.ConditionOperatorDropdown;
+  }
 }
+
+export {};

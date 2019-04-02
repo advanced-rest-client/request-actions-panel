@@ -5,20 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   request-variable-editor.html
+ *   request-variable-editor.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-toggle-button/paper-toggle-button.d.ts" />
-/// <reference path="../paper-icon-button/paper-icon-button.d.ts" />
-/// <reference path="../paper-combobox/paper-combobox.d.ts" />
 
 declare namespace UiElements {
 
@@ -34,7 +26,7 @@ declare namespace UiElements {
    * ----------------|-------------|----------
    * `--request-variable-editor` | Mixin applied to the element | `{}`
    */
-  class RequestVariableEditor extends Polymer.Element {
+  class RequestVariableEditor extends PolymerElement {
 
     /**
      * Definied action.
@@ -59,6 +51,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "request-variable-editor": UiElements.RequestVariableEditor;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "request-variable-editor": UiElements.RequestVariableEditor;
+  }
 }
+
+export {};

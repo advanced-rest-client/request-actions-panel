@@ -5,19 +5,11 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   request-action-iterator-editor.html
+ *   request-action-iterator-editor.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu-light.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../paper-item/paper-item.d.ts" />
-/// <reference path="condition-operator-dropdown.d.ts" />
 
 declare namespace UiElements {
 
@@ -132,7 +124,7 @@ declare namespace UiElements {
    * `--request-action-iterator-editor` | Mixin applied to the element | `{}`
    * `--request-action-iterator-editor-background-color` | Background color of the editor | `#fff`
    */
-  class RequestActionIteratorEditor extends Polymer.Element {
+  class RequestActionIteratorEditor extends PolymerElement {
 
     /**
      * Model for iterator.
@@ -146,6 +138,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "request-action-iterator-editor": UiElements.RequestActionIteratorEditor;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "request-action-iterator-editor": UiElements.RequestActionIteratorEditor;
+  }
 }
+
+export {};
