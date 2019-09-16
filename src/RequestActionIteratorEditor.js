@@ -170,7 +170,8 @@ export class RequestActionIteratorEditor extends LitElement {
     }
     `;
   }
-  static get template() {
+
+  render() {
     const {
       readOnly,
       compatibility,

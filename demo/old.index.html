@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <title>request-actions-panel demo</title>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../../../web-animations-js/web-animations-next.min.js"></script>
+  <script type="module" src="../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
+  <script type="module" src="../../../@advanced-rest-client/variables-manager/variables-manager.js"></script>
+  <script type="module" src="../../../@advanced-rest-client/arc-models/variables-model.js"></script>
+  <script type="module" src="../request-actions-panel.js"></script>
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
+    :root {
+      --primary-color: #00A2DF;
+      --action-button: {
+        background-color: var(--primary-color);
+        background-image: none;
+        color: white;
+        transition: background-color 300ms linear;
+      };
+
+      --action-button-hover: {
+        background-color: #04b3f5;
+        background-image: none;
+        color: white;
+      };
+
+      --arc-font-body1: {
+        @apply --paper-font-body1;
+      };
+    }
+    </style>
+  </custom-style>
+</head>
+<body unresolved>
+  <div class="vertical-section-container centered">
+    <h3>The `request-actions-panel`</h3>
+    <variables-model></variables-model>
+    <variables-manager></variables-manager>
+    <request-actions-panel></request-actions-panel>
+  </div>
+</body>
+</html>

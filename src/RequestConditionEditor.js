@@ -11,15 +11,11 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { LitElement, html, css } from 'lit-element';
-import { clear } from '@advanced-rest-client/arc-icons/arc-icons.js';
-import '@anypoint-web-components/anypoint-input/anypoint-input.js';
+import { html, css } from 'lit-element';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
-import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
-import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
-import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '../condition-operator-dropdown.js';
+import { ActionBase } from './ActionBase.js';
 /**
  * An editor for request / response editors.
  * It creates data model that is accetable in ARC elements ecosystem for conditions.
@@ -101,7 +97,7 @@ import '../condition-operator-dropdown.js';
  * @customElement
  * @demo demo/index.html
  */
-export class RequestConditionEditor extends LitElement {
+export class RequestConditionEditor extends ActionBase {
   static get styles() {
     return css`
     :host {
@@ -170,63 +166,15 @@ export class RequestConditionEditor extends LitElement {
       condition,
       compatibility,
       outlined,
-      sourceType,
-      source,
       sourcePath,
       _pathHidden
     } = this;
     return html`
     <div class="container">
-      <anypoint-switch
-        class="enable-button"
-        checked="${condition.enabled}"
-        ?disabled="${readOnly}"
-        name="enabled"
-        ?compatibility="${compatibility}"
-        @checked-changed="${this._enabledHandler}"
-      ></anypoint-switch>
+      ${this._propertySwitchTemplate()}
       <div class="form">
-        <anypoint-dropdown-menu
-          dynamicalign
-          class="source-main"
-          ?disabled="${readOnly}"
-          ?compatibility="${compatibility}"
-          ?outlined="${outlined}"
-        >
-          <label slot="label">Source</label>
-          <anypoint-listbox
-            slot="dropdown-content"
-            attrforselected="value"
-            ?compatibility="${this.compatibility}"
-            data-name="source"
-            .selected="${source}"
-            @selected-changed="${this._selectionHandler}">
-            <anypoint-item value="request">Request</anypoint-item>
-            <anypoint-item value="response">Response</anypoint-item>
-          </anypoint-listbox>
-        </anypoint-dropdown-menu>
-
-        <anypoint-dropdown-menu
-          dynamicalign
-          class="source-type"
-          ?disabled="${readOnly}"
-          ?compatibility="${compatibility}"
-          ?outlined="${outlined}"
-        >
-          <label slot="label">Type</label>
-          <anypoint-listbox
-            slot="dropdown-content"
-            attrforselected="value"
-            ?compatibility="${this.compatibility}"
-            data-name="sourceType"
-            .selected="${sourceType}"
-            @selected-changed="${this._selectionHandler}">
-            <anypoint-item value="url">Url</anypoint-item>
-            <anypoint-item value="status">Status code</anypoint-item>
-            <anypoint-item value="headers">Headers</anypoint-item>
-            <anypoint-item value="body">Body</anypoint-item>
-          </anypoint-listbox>
-        </anypoint-dropdown-menu>
+        ${this._sourceTemplate()}
+        ${this._sourceTypeTemplate()}
 
         <anypoint-input
           class="source-path"
@@ -265,14 +213,7 @@ export class RequestConditionEditor extends LitElement {
           <label slot="label">Condition value</label>
         </anypoint-input>
       </div>
-      <anypoint-icon-button
-        class="delete-icon"
-        @click="${this.remove}"
-        title="Remove condition"
-        ?disabled="${readOnly}"
-        ?compatibility="${compatibility}"
-      >
-        <span class="icon">${clear}</span>
+      ${this._removeTemplate()}
       </anypoint-icon-button>
     </div>
 `;
@@ -302,19 +243,7 @@ export class RequestConditionEditor extends LitElement {
        * Value computed from the `action.source` property.
        * Binded to path input field.
        */
-      sourcePath: { type: String },
-      /**
-       * Renders the editor in read only mode
-       */
-      readOnly: { type: Boolean },
-      /**
-       * Enables compatibility with Anypoint platform
-       */
-      compatibility: { type: Boolean },
-      /**
-       * Enables Material Design Outlined inputs
-       */
-      outlined: { type: Boolean }
+      sourcePath: { type: String }
     };
   }
 
@@ -336,6 +265,11 @@ export class RequestConditionEditor extends LitElement {
     this._conditionChanged(value);
   }
 
+  constructor() {
+    super();
+    this._changeProperty = 'condition';
+  }
+
   // Clears the path info.
   clear() {
     this.source = '';
@@ -348,28 +282,6 @@ export class RequestConditionEditor extends LitElement {
     if (condition && condition.source) {
       this._processSource(condition.source);
     }
-  }
-  /**
-   * Sets path info variables when action's source change.
-   * @param {String} source Current source of the action.
-   */
-  _processSource(source) {
-    const parts = source.split('.');
-    this.source = parts[0] || '';
-    this.sourceType = parts[1] || '';
-    this.sourcePath = parts.splice(2).join('.');
-  }
-
-  _computeSourcePath() {
-    const { source, sourceType, sourcePath } = this;
-    let path = source || '';
-    if (sourceType) {
-      path += '.' + sourceType;
-    }
-    if (sourcePath) {
-      path += '.' + sourcePath;
-    }
-    this.condition.source = path;
   }
   /**
    * Dispatches the `remove-action-item` custom event so the panel can remove

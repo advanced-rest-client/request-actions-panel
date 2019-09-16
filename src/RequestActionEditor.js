@@ -11,14 +11,11 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { LitElement, html, css } from 'lit-element';
-import '@anypoint-web-components/anypoint-combobox/anypoint-combobox.js';
+import { ActionBase } from './ActionBase.js';
+import { html, css } from 'lit-element';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
-import '@anypoint-web-components/anypoint-input/anypoint-input.js';
+import '@anypoint-web-components/anypoint-combobox/anypoint-combobox.js';
 import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
-import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
-import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
-import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@polymer/iron-collapse/iron-collapse.js';
 import '../request-condition-editor.js';
 import '../request-action-iterator-editor.js';
@@ -36,7 +33,7 @@ import '../request-action-iterator-editor.js';
  * @customElement
  * @demo demo/index.html
  */
-export class RequestActionEditor extends LitElement {
+export class RequestActionEditor extends ActionBase {
   static get styles() {
     return css`
     :host {
@@ -151,14 +148,7 @@ export class RequestActionEditor extends LitElement {
     return html`
     <header>
       ${opened ? html`<span class="action-enabler">
-        <anypoint-switch
-          class="enable-button"
-          .checked="${action.enabled}"
-          ?disabled="${readOnly}"
-          name="action.enabled"
-          ?compatibility="${compatibility}"
-          @checked-changed="${this._enabledHandler}"
-        ></anypoint-switch>
+        ${this._propertySwitchTemplate()}
         Action ${actionStateLabel}
       </span>` : ''}
       <span class="flex-spacer short-info">
@@ -169,100 +159,16 @@ export class RequestActionEditor extends LitElement {
         <anypoint-button
           class="toggle-editor"
           @click="${this.toggleOpened}"
+          ?compatibility="${compatibility}"
         >${togglePanelLabel}</anypoint-button>
         <anypoint-button
           class="remove-action"
           @click="${this.remove}"
+          ?compatibility="${compatibility}"
           ?disabled="${readOnly}"
         >Remove action</anypoint-button>
       </span>
     </header>`;
-  }
-
-  _sourceTemplate() {
-    const {
-      readOnly,
-      compatibility,
-      outlined,
-      source
-    } = this;
-    return html`
-    <anypoint-dropdown-menu
-      dynamicalign
-      ?disabled="${readOnly}"
-      ?compatibility="${compatibility}"
-      ?outlined="${outlined}"
-      class="source-main"
-    >
-      <label slot="label">Source</label>
-      <anypoint-listbox
-        slot="dropdown-content"
-        attrforselected="value"
-        ?compatibility="${compatibility}"
-        .selected="${source}"
-        data-name="source"
-        @selected-changed="${this._selectionHandler}"
-      >
-        <anypoint-item value="request">Request</anypoint-item>
-        <anypoint-item value="response">Response</anypoint-item>
-      </anypoint-listbox>
-    </anypoint-dropdown-menu>
-    `;
-  }
-
-  _sourceTypeTemplate() {
-    const {
-      readOnly,
-      compatibility,
-      outlined,
-      sourceType
-    } = this;
-    return html`
-    <anypoint-dropdown-menu
-      dynamicalign
-      class="source-type"
-      ?disabled="${readOnly}"
-      ?compatibility="${compatibility}"
-      ?outlined="${outlined}"
-    >
-      <label slot="label">Type</label>
-      <anypoint-listbox
-        slot="dropdown-content"
-        attrforselected="value"
-        ?compatibility="${compatibility}"
-        data-name="sourceType"
-        .selected="${sourceType}"
-        @selected-changed="${this._selectionHandler}"
-      >
-        <anypoint-item value="url">Url</anypoint-item>
-        <anypoint-item value="status">Status code</anypoint-item>
-        <anypoint-item value="headers">Headers</anypoint-item>
-        <anypoint-item value="body">Body</anypoint-item>
-      </anypoint-listbox>
-    </anypoint-dropdown-menu>
-    `;
-  }
-
-  _pathTemplate() {
-    const {
-      readOnly,
-      compatibility,
-      outlined,
-      sourcePath,
-      pathHidden
-    } = this;
-    return html`<anypoint-input
-      class="source-path"
-      .value="${sourcePath}"
-      name="sourcePath"
-      @value-changed="${this._inputChanged}"
-      ?readonly="${readOnly}"
-      ?compatibility="${compatibility}"
-      ?outlined="${outlined}"
-      ?hidden="${pathHidden}"
-    >
-      <label slot="label">Path to data (optional)</label>
-    </anypoint-input>`;
   }
 
   _actionTemplate() {
@@ -287,7 +193,7 @@ export class RequestActionEditor extends LitElement {
         ?compatibility="${compatibility}"
         data-name="action.action"
         .selected="${action.action}"
-        @selected-changed="${this._selectionHandler}"
+        @selected-changed="${this._propertySelectionHandler}"
       >
         <anypoint-item value="assign-variable">Assign variable</anypoint-item>
         <anypoint-item value="store-variable">Store variable</anypoint-item>
@@ -310,7 +216,7 @@ export class RequestActionEditor extends LitElement {
       autovalidate
       name="action.destination"
       .value="${action.destination}"
-      @value-changed="${this._inputChanged}"
+      @value-changed="${this._propertyInputChanged}"
       class="destination"
       .source="${variablesSuggestions}"
       ?disabled="${readOnly}"
@@ -360,11 +266,12 @@ export class RequestActionEditor extends LitElement {
       ${_renderIterator ? html`<span class="iterator-enabler">
         <anypoint-switch
           data-action="iterable-toggle"
+          data-update-ui="true"
           .checked="${action.hasIterator}"
           ?disabled="${readOnly}"
           name="action.hasIterator"
           ?compatibility="${compatibility}"
-          @checked-changed="${this._enabledHandler}"
+          @checked-changed="${this._propertyEnabledHandler}"
         ></anypoint-switch>
         Iterator ${iteratorStatusLabel}
       </span>` : ''}
@@ -445,19 +352,7 @@ export class RequestActionEditor extends LitElement {
        */
       opened: { type: Boolean },
 
-      _renderIterator: { type: Boolean },
-      /**
-       * Renders the editor in read only mode
-       */
-      readOnly: { type: Boolean },
-      /**
-       * Enables compatibility with Anypoint platform
-       */
-      compatibility: { type: Boolean },
-      /**
-       * Enables Material Design Outlined inputs
-       */
-      outlined: { type: Boolean }
+      _renderIterator: { type: Boolean }
     };
   }
 
@@ -506,6 +401,11 @@ export class RequestActionEditor extends LitElement {
     this._actionChanged(value);
   }
 
+  constructor() {
+    super();
+    this._changeProperty = 'action';
+  }
+
   static get observers() {
     return [
       '_hasIteratorChanged(action.hasIterator)'
@@ -525,39 +425,7 @@ export class RequestActionEditor extends LitElement {
       this._processSource(action.source);
     }
   }
-  /**
-   * Sets path info variables when action's source change.
-   * @param {String} source Current source of the action.
-   */
-  _processSource(source) {
-    const parts = source.split('.');
-    this.source = parts[0] || '';
-    this.sourceType = parts[1] || '';
-    this.sourcePath = parts.splice(2).join('.');
-  }
 
-  _computeSourcePath(source, sourceType, sourcePath) {
-    let path = source || '';
-    if (sourceType) {
-      path += '.' + sourceType;
-    }
-    if (sourcePath) {
-      path += '.' + sourcePath;
-    }
-
-    if (!this.action) {
-      this.action = { source: path };
-    } else {
-      this.action.source = path;
-    }
-  }
-  /**
-   * Dispatches the `remove-action-item` custom event so the panel can remove
-   * the item from the list.
-   */
-  remove() {
-    this.dispatchEvent(new CustomEvent('remove-action-item'));
-  }
   // Handler for add condition button click.
   _appendCondition() {
     this.addCondition();
@@ -624,32 +492,5 @@ export class RequestActionEditor extends LitElement {
       return true;
     }
     return false;
-  }
-
-  _inputChanged(e) {
-    const { name, value } = e.target;
-    const cndProp = name.indexOf('action') === 0;
-    if (cndProp) {
-      this.action[name] = value;
-    } else {
-      this[name] = value;
-      this._computeSourcePath();
-    }
-    this._notify();
-  }
-
-  _enabledHandler(e) {
-    const { name } = e.target;
-    const value = e.detail.value;
-    this.action[name] = value;
-    this._notify();
-  }
-
-  _notify() {
-    this.dispatchEvent(new CustomEvent('action-changed', {
-      detail: {
-        value: this.condition
-      }
-    }));
   }
 }

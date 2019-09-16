@@ -11,11 +11,9 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { LitElement, html, css } from 'lit-element';
-import { clear } from '@advanced-rest-client/arc-icons/ArcIcons.js';
+import { ActionBase } from './ActionBase.js';
+import { html, css } from 'lit-element';
 import '@anypoint-web-components/anypoint-input/anypoint-input.js';
-import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
-import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import '@anypoint-web-components/anypoint-combobox/anypoint-combobox.js';
 /**
  * Variable editor allows to edit variables in actions editor.
@@ -33,7 +31,7 @@ import '@anypoint-web-components/anypoint-combobox/anypoint-combobox.js';
  * @memberof UiElements
  * @demo demo/index.html
  */
-export class RequestVariableEditor extends LitElement {
+export class RequestVariableEditor extends ActionBase {
   static get styles() {
     return css`
     :host {
@@ -73,21 +71,15 @@ export class RequestVariableEditor extends LitElement {
     const action = this.action || {};
     return html`
     <div class="item">
-      <anypoint-switch
-        class="enable-button"
-        .checked="${action.enabled}"
-        ?disabled="${readOnly}"
-        name="enabled"
-        ?compatibility="${compatibility}"
-        @checked-changed="${this._enabledHandler}"></anypoint-switch>
+      ${this._propertySwitchTemplate()}
       <anypoint-combobox
         required
         autovalidate
         .value="${action.variable}"
         .source="${variablesSuggestions}"
         ?readonly="${readOnly}"
-        name="variable"
-        @value-changed="${this._inputChanged}"
+        name="action.variable"
+        @value-changed="${this._propertyInputChanged}"
         ?compatibility="${compatibility}"
         ?outlined="${outlined}"
       >
@@ -98,19 +90,12 @@ export class RequestVariableEditor extends LitElement {
         ?readonly="${readOnly}"
         ?compatibility="${compatibility}"
         ?outlined="${outlined}"
-        name="value"
-        @value-changed="${this._inputChanged}"
+        name="action.value"
+        @value-changed="${this._propertyInputChanged}"
       >
         <label slot="label">Variable value</label>
       </anypoint-input>
-      <anypoint-icon-button
-        @click="${this.remove}"
-        title="Remove request action"
-        ?disabled="${readOnly}"
-        ?compatibility="${compatibility}"
-      >
-        <span class="icon">${clear}</span>
-      </anypoint-icon-button>
+      ${this._removeTemplate()}
     </div>
 `;
   }
@@ -124,54 +109,12 @@ export class RequestVariableEditor extends LitElement {
       /**
        * List of variables sugesstions to display in the combo box.
        */
-      variablesSuggestions: { type: Array },
-      /**
-       * Renders the editor in read only mode
-       */
-      readOnly: { type: Boolean },
-      /**
-       * Enables compatibility with Anypoint platform
-       */
-      compatibility: { type: Boolean },
-      /**
-       * Enables Material Design Outlined inputs
-       */
-      outlined: { type: Boolean },
+      variablesSuggestions: { type: Array }
     };
   }
-  /**
-   * Dispatches the `remove-action-item` custom event so the panel can remove
-   * the item from the list.
-   */
-  remove() {
-    this.dispatchEvent(new CustomEvent('remove-action-item', {
-      bubbles: false
-    }));
-  }
 
-  _inputChanged(e) {
-    const { name, value } = e.target;
-    this.action[name] = value;
-    this._notify();
+  constructor() {
+    super();
+    this._changeProperty = 'action';
   }
-
-  _enabledHandler(e) {
-    const { name } = e.target;
-    const value = e.detail.value;
-    this.action[name] = value;
-    this._notify();
-  }
-
-  _notify() {
-    this.dispatchEvent(new CustomEvent('action-changed', {
-      detail: {
-        value: this.action
-      }
-    }));
-  }
-
-  /**
-   * Dispatched when the user requested to remove the item.
-   * @event remove-action-item
-   */
 }
