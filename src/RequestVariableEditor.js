@@ -12,7 +12,7 @@ License for the specific language governing permissions and limitations under
 the License.
 */
 import { LitElement, html, css } from 'lit-element';
-import { clear } from '@advanced-rest-client/arc-icons/arc-icons.js';
+import { clear } from '@advanced-rest-client/arc-icons/ArcIcons.js';
 import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
@@ -75,7 +75,7 @@ export class RequestVariableEditor extends LitElement {
     <div class="item">
       <anypoint-switch
         class="enable-button"
-        checked="${action.enabled}"
+        .checked="${action.enabled}"
         ?disabled="${readOnly}"
         name="enabled"
         ?compatibility="${compatibility}"

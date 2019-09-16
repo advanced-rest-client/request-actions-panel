@@ -387,7 +387,7 @@ export class RequestConditionEditor extends LitElement {
 
   _inputChanged(e) {
     const { name, value } = e.target;
-    const cndProp = name.indexOf('condition') === 1;
+    const cndProp = name.indexOf('condition') === 0;
     if (cndProp) {
       this.condition[name] = value;
     } else {
