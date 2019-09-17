@@ -5,46 +5,10 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   condition-operator-dropdown.html
+ *   condition-operator-dropdown.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/legacy/class.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../paper-item/paper-item.d.ts" />
-/// <reference path="../iron-form-element-behavior/iron-form-element-behavior.d.ts" />
-
-declare namespace UiElements {
-
-  /**
-   * Variable editor allows to edit variables in actions editor.
-   *
-   * ### Styling
-   *
-   * `<condition-operator-dropdown>` provides the following custom properties and
-   * mixins for styling:
-   *
-   * Custom property | Description | Default
-   * ----------------|-------------|----------
-   * `--condition-operator-dropdown` | Mixin applied to the element | `{}`
-   * `--condition-operator-dropdown-background-color` | Background color of the
-   * editor | `rgba(0, 162, 223, 0.05)`
-   */
-  class ConditionOperatorDropdown extends
-    Polymer.IronFormElementBehavior(
-    Object) {
-
-    /**
-     * Renders the editor in read only mode
-     */
-    readonly: boolean|null|undefined;
-  }
-}
-
-interface HTMLElementTagNameMap {
-  "condition-operator-dropdown": UiElements.ConditionOperatorDropdown;
-}
+import {ConditionOperatorDropdown} from './src/ConditionOperatorDropdown.js';
