@@ -452,7 +452,8 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
   }
 
   get hasRequestActions() {
-    const items = this.beforeActions.variables || [];
+    const actions = this.beforeActions || {};
+    const items = actions.variables || [];
     return !!(items && items.length);
   }
 
@@ -574,6 +575,9 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
       enabled: true
     };
     model = Object.assign(model, opts);
+    if (!this.beforeActions) {
+      this.beforeActions = {};
+    }
     const items = this.beforeActions.variables || [];
     items.push(model);
     this.beforeActions.variables = items;
