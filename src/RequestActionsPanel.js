@@ -253,7 +253,9 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
     }
 
     h3 {
-      font-size: 20px;
+      font-size: var(--arc-font-subhead-font-size);
+      font-weight: var(--arc-font-subhead-font-weight);
+      line-height: var(--arc-font-subhead-line-height);
     }
 
     .help-button {
