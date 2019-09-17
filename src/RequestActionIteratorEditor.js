@@ -11,8 +11,8 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { LitElement, html, css } from 'lit-element';
-import '@anypoint-web-components/anypoint-input/anypoint-input.js';
+import { ActionBase } from './ActionBase.js';
+import { html, css } from 'lit-element';
 import '../condition-operator-dropdown.js';
 /**
  * An editor for response iterator.
@@ -129,7 +129,7 @@ import '../condition-operator-dropdown.js';
  * @customElement
  * @demo demo/index.html
  */
-export class RequestActionIteratorEditor extends LitElement {
+export class RequestActionIteratorEditor extends ActionBase {
   static get styles() {
     return css`
     :host {
@@ -191,7 +191,8 @@ export class RequestActionIteratorEditor extends LitElement {
     <div class="form">
       <anypoint-input
         .value="${iterator.source}"
-        name="source"
+        name="iterator.source"
+        @value-changed="${this._propertyInputChanged}"
         class="source-path"
         ?readonly="${readOnly}"
         ?compatibility="${compatibility}"
@@ -202,6 +203,8 @@ export class RequestActionIteratorEditor extends LitElement {
       <condition-operator-dropdown
         class="condition-type"
         .value="${iterator.operator}"
+        name="iterator.operator"
+        @value-changed="${this._propertyInputChanged}"
         ?readonly="${readOnly}"
         ?compatibility="${compatibility}"
         ?outlined="${outlined}"
@@ -210,7 +213,8 @@ export class RequestActionIteratorEditor extends LitElement {
         required
         autovalidate
         .value="${iterator.condition}"
-        name="condition"
+        name="iterator.condition"
+        @value-changed="${this._propertyInputChanged}"
         class="condition"
         ?readonly="${readOnly}"
         ?compatibility="${compatibility}"
@@ -242,17 +246,8 @@ export class RequestActionIteratorEditor extends LitElement {
     };
   }
 
-  _inputChanged(e) {
-    const { name, value } = e.target;
-    this.iterator[name] = value;
-    this._notify();
-  }
-
-  _notify() {
-    this.dispatchEvent(new CustomEvent('iterator-changed', {
-      detail: {
-        value: this.action
-      }
-    }));
+  constructor() {
+    super();
+    this._changeProperty = 'iterator';
   }
 }

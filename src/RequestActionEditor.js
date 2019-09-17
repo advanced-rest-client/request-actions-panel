@@ -15,7 +15,6 @@ import { ActionBase } from './ActionBase.js';
 import { html, css } from 'lit-element';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-combobox/anypoint-combobox.js';
-import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 import '@polymer/iron-collapse/iron-collapse.js';
 import '../request-condition-editor.js';
 import '../request-action-iterator-editor.js';
@@ -135,6 +134,168 @@ export class RequestActionEditor extends ActionBase {
     }`;
   }
 
+  static get properties() {
+    return {
+      /**
+       * Definied action.
+       */
+      action: { type: Object, notify: true, },
+      /**
+       * Value computed from the `action.source` property.
+       * Binded to source input field.
+       */
+      source: { type: String },
+      /**
+       * Value computed from the `action.source` property.
+       * Binded to source type input field.
+       */
+      sourceType: { type: String },
+      /**
+       * Value computed from the `action.source` property.
+       * Binded to path input field.
+       */
+      sourcePath: { type: String },
+      /**
+       * List of variables sugesstions to display in the combo box.
+       */
+      variablesSuggestions: { type: Array },
+      /**
+       * True to open the editor view.
+       */
+      opened: { type: Boolean },
+
+      _renderIterator: { type: Boolean }
+    };
+  }
+
+  get actionStateLabel() {
+    const action = this.action || {};
+    return action.enabled ? 'enabled' : 'disabled';
+  }
+
+  get actionLabel() {
+    const action = this.action || {};
+    return action.action === 'assign-variable' ? 'Assign variable' : 'Store variable';
+  }
+
+  get togglePanelLabel() {
+    return this.opened ? 'Hide editor' : 'Show editor';
+  }
+
+  get _pathHidden() {
+    return this.sourceType === 'status';
+  }
+
+  get iteratorStatusLabel() {
+    const action = this.action || {};
+    return action.hasIterator ? 'enabled' : 'disabled';
+  }
+
+  get _renderIterator() {
+    const { source, sourceType } = this;
+    if (source === 'response' && sourceType === 'body') {
+      return true;
+    }
+    return false;
+  }
+
+  get action() {
+    return this._action
+  }
+
+  set action(value) {
+    const old = this._action;
+    if (old === value) {
+      return;
+    }
+    this._action = value;
+    this.requestUpdate('action', value);
+    this._actionChanged(value);
+  }
+
+  constructor() {
+    super();
+    this._changeProperty = 'action';
+  }
+
+  // Clears the path info.
+  clear() {
+    this.source = '';
+    this.sourceType = '';
+    this.sourcePath = '';
+  }
+
+  _actionChanged(action) {
+    this.clear();
+    if (action && action.source) {
+      this._processSource(action.source);
+    }
+  }
+
+  // Handler for add condition button click.
+  _appendCondition() {
+    this.addCondition();
+  }
+  /**
+   * Adds a condition to conditions list.
+   *
+   * @param {?Object} opts Optional model properties for the condition.
+   */
+  addCondition(opts) {
+    if (!opts) {
+      opts = {};
+    }
+    let model = {
+      source: 'response.status',
+      operator: 'equal',
+      condition: 200,
+      enabled: true
+    };
+    model = Object.assign(model, opts);
+    if (!this.action) {
+      this.action = {};
+    }
+    if (!this.action.conditions) {
+      this.action.conditions = [model];
+    } else {
+      this.action.conditions.push(model);
+    }
+    this.requestUpdate();
+    this._notifyChangeProperty();
+  }
+  /**
+   * Handles delete of the condition.
+   * @param {CustomEvent} e
+   */
+  _removeCondition(e) {
+    const index = Number(e.target.dataset.index);
+    const items = this.action.conditions;
+    items.splice(index, 1);
+    this.action.conditions = [...items];
+    this.requestUpdate();
+    this._notifyChangeProperty();
+  }
+  /**
+   * Toggles opened state of the editor.
+   */
+  toggleOpened() {
+    this.opened = !this.opened;
+  }
+
+  _iteratorChanged(e) {
+    this._propertyEnabledHandler(e);
+    if (!e.detail.value || this.action.iterator) {
+      return;
+    }
+    this.action.iterator = {
+      source: 'data.*.property',
+      operator: 'equal',
+      condition: ''
+    };
+    this.requestUpdate();
+    this._notifyChangeProperty();
+  }
+
   _headerTemplate() {
     const {
       opened,
@@ -211,7 +372,6 @@ export class RequestActionEditor extends ActionBase {
     } = this;
     const action = this.action || {};
     return html`<anypoint-combobox
-      label="Variable name"
       required
       autovalidate
       name="action.destination"
@@ -222,7 +382,9 @@ export class RequestActionEditor extends ActionBase {
       ?disabled="${readOnly}"
       ?compatibility="${compatibility}"
       ?outlined="${outlined}"
-    ></anypoint-combobox>`;
+    >
+      <label slot="label">Variable name</label>
+    </anypoint-combobox>`;
   }
 
   _conditionsTemplate() {
@@ -239,8 +401,9 @@ export class RequestActionEditor extends ActionBase {
     return html`<div class="conditions-form">
     ${conditions.map((item, index) => html`<request-condition-editor
       .condition="${item}"
+      @condition-changed="${this._notifyChangeProperty}"
       data-index="${index}"
-      @remove-condition-item="${this._removeCondition}"
+      @remove="${this._removeCondition}"
       ?readonly="${readOnly}"
       ?compatibility="${compatibility}"
       ?outlined="${outlined}"
@@ -271,9 +434,10 @@ export class RequestActionEditor extends ActionBase {
           ?disabled="${readOnly}"
           name="action.hasIterator"
           ?compatibility="${compatibility}"
-          @checked-changed="${this._propertyEnabledHandler}"
-        ></anypoint-switch>
-        Iterator ${iteratorStatusLabel}
+          @checked-changed="${this._iteratorChanged}"
+        >
+          Iterator ${iteratorStatusLabel}
+        </anypoint-switch>
       </span>` : ''}
     </div>
     `;
@@ -291,6 +455,7 @@ export class RequestActionEditor extends ActionBase {
     }
     return html`<request-action-iterator-editor
       .iterator="${action.iterator}"
+      @iterator-changed="${this._notifyChangeProperty}"
       ?compatibility="${compatibility}"
       ?outlined="${outlined}"
       ?readonly="${readOnly}"
@@ -320,177 +485,5 @@ export class RequestActionEditor extends ActionBase {
     <iron-collapse .opened="${opened}">
       ${this._formTemplate()}
     </iron-collapse>`;
-  }
-
-  static get properties() {
-    return {
-      /**
-       * Definied action.
-       */
-      action: { type: Object, notify: true, },
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to source input field.
-       */
-      source: { type: String },
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to source type input field.
-       */
-      sourceType: { type: String },
-      /**
-       * Value computed from the `action.source` property.
-       * Binded to path input field.
-       */
-      sourcePath: { type: String },
-      /**
-       * List of variables sugesstions to display in the combo box.
-       */
-      variablesSuggestions: { type: Array },
-      /**
-       * True to open the editor view.
-       */
-      opened: { type: Boolean },
-
-      _renderIterator: { type: Boolean }
-    };
-  }
-
-  get actionStateLabel() {
-    const action = this.action || {};
-    return action.enabled ? 'enabled' : 'disabled';
-  }
-
-  get actionLabel() {
-    const action = this.action || {};
-    return action.action === 'assign-variable' ? 'Assign variable' : 'Store variable';
-  }
-
-  get togglePanelLabel() {
-    return this.opened ? 'Hide editor' : 'Show editor';
-  }
-
-  get pathHidden() {
-    return this.sourceType === 'status';
-  }
-
-  get iteratorStatusLabel() {
-    const action = this.action || {};
-    return action.hasIterator ? 'enabled' : 'disabled';
-  }
-
-  get _renderIterator() {
-    const { source, sourceType } = this;
-    if (source === 'response' && sourceType === 'body') {
-      return true;
-    }
-    return false;
-  }
-
-  get action() {
-    return this._action
-  }
-
-  set action(value) {
-    const old = this._action;
-    if (old === value) {
-      return;
-    }
-    this._action = value;
-    this.requestUpdate('action', value);
-    this._actionChanged(value);
-  }
-
-  constructor() {
-    super();
-    this._changeProperty = 'action';
-  }
-
-  static get observers() {
-    return [
-      '_hasIteratorChanged(action.hasIterator)'
-    ];
-  }
-
-  // Clears the path info.
-  clear() {
-    this.source = '';
-    this.sourceType = '';
-    this.sourcePath = '';
-  }
-
-  _actionChanged(action) {
-    this.clear();
-    if (action && action.source) {
-      this._processSource(action.source);
-    }
-  }
-
-  // Handler for add condition button click.
-  _appendCondition() {
-    this.addCondition();
-  }
-  /**
-   * Adds a condition to conditions list.
-   *
-   * @param {?Object} opts Optional model properties for the condition.
-   */
-  addCondition(opts) {
-    if (!opts) {
-      opts = {};
-    }
-    let model = {
-      source: 'response.status',
-      operator: 'equal',
-      condition: 200,
-      enabled: true
-    };
-    model = Object.assign(model, opts);
-    if (!this.action) {
-      this.action = {};
-    }
-    if (!this.action.conditions) {
-      this.action.conditions = [model];
-    } else {
-      this.action.conditions.push(model);
-    }
-  }
-  /**
-   * Handles delete of the condition.
-   * @param {CustomEvent} e
-   */
-  _removeCondition(e) {
-    const index = Number(e.target.dataset.index);
-    const items = this.action.conditions;
-    items.splice(index, 1);
-    this.action.conditions = [...items];
-    this.requestUpdate();
-  }
-  /**
-   * Toggles opened state of the editor.
-   */
-  toggleOpened() {
-    this.opened = !this.opened;
-  }
-
-  _hasIteratorChanged(enabled) {
-    if (!enabled) {
-      return;
-    }
-    if (this.action.iterator) {
-      return;
-    }
-    this.set('action.iterator', {
-      source: 'data.*.property',
-      operator: 'equal',
-      condition: ''
-    });
-  }
-
-  _computeRenderIterator(source, sourceType) {
-    if (source === 'response' && sourceType === 'body') {
-      return true;
-    }
-    return false;
   }
 }

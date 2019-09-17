@@ -464,7 +464,7 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
   constructor() {
     super();
     this._variablesHandler = this._variablesHandler.bind(this);
-    this.beforeActions = [];
+    this.beforeActions = {};
     this.afterActions = [];
   }
 

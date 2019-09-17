@@ -5,6 +5,7 @@ import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
+import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
 
 export class ActionBase extends LitElement {
   static get properties() {
@@ -34,7 +35,7 @@ export class ActionBase extends LitElement {
    * @param {String} source Current source of the action.
    */
   _processSource(source) {
-    const parts = source.split('.');
+    const parts = (source || '').split('.');
     this.source = parts[0] || '';
     this.sourceType = parts[1] || '';
     this.sourcePath = parts.splice(2).join('.');
@@ -46,8 +47,11 @@ export class ActionBase extends LitElement {
     if (sourceType) {
       path += '.' + sourceType;
     }
-    if (sourcePath) {
+    if (sourcePath && sourceType !== 'status') {
       path += '.' + sourcePath;
+    }
+    if (!this[this._changeProperty]) {
+      this[this._changeProperty] = {};
     }
     this[this._changeProperty].source = path;
     this._notifyChangeProperty();
@@ -111,7 +115,7 @@ export class ActionBase extends LitElement {
   _notifyChangeProperty() {
     this.dispatchEvent(new CustomEvent(`${this._changeProperty}-changed`, {
       detail: {
-        value: this.condition
+        value: this[this._changeProperty]
       }
     }));
   }
@@ -194,7 +198,7 @@ export class ActionBase extends LitElement {
       compatibility,
       outlined,
       sourcePath,
-      pathHidden
+      _pathHidden
     } = this;
     return html`<anypoint-input
       class="source-path"
@@ -204,7 +208,7 @@ export class ActionBase extends LitElement {
       ?readonly="${readOnly}"
       ?compatibility="${compatibility}"
       ?outlined="${outlined}"
-      ?hidden="${pathHidden}"
+      ?hidden="${_pathHidden}"
     >
       <label slot="label">Path to data (optional)</label>
     </anypoint-input>`;
@@ -216,7 +220,7 @@ export class ActionBase extends LitElement {
       compatibility
     } = this;
     return html`<anypoint-icon-button
-      class="delete-icon icon"
+      class="delete-icon"
       @click="${this.remove}"
       title="Remove condition"
       ?disabled="${readOnly}"
@@ -233,7 +237,8 @@ export class ActionBase extends LitElement {
       _changeProperty
     } = this;
     const propName = `${_changeProperty}.enabled`;
-    const checked = this[_changeProperty].enabled;
+    const property = this[_changeProperty] || {};
+    const checked = property.enabled;
     return html`<anypoint-switch
       class="enable-button"
       .checked="${checked}"
@@ -241,6 +246,7 @@ export class ActionBase extends LitElement {
       name="${propName}"
       ?compatibility="${compatibility}"
       @checked-changed="${this._propertyEnabledHandler}"
+      aria-label="Activate to enable or disable this item"
     ></anypoint-switch>`;
   }
 }

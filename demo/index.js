@@ -10,12 +10,16 @@ class DemoPage extends ArcDemoPage {
     super();
     this.initObservableProperties([
       'compatibility',
-      'outlined'
+      'outlined',
+      'beforeactions',
+      'afteractions',
+      'readOnly'
     ]);
     this._componentName = 'request-actions-panel';
     this.demoStates = ['Filled', 'Outlined', 'Anypoint'];
     this._demoStateHandler = this._demoStateHandler.bind(this);
     this._toggleMainOption = this._toggleMainOption.bind(this);
+    this._actionChanged = this._actionChanged.bind(this);
   }
 
   _toggleMainOption(e) {
@@ -31,7 +35,9 @@ class DemoPage extends ArcDemoPage {
 
   _actionChanged(e) {
     const name = e.type.split('-')[0];
-    console.log(name, e.detail.value);
+    const { value } = e.detail;
+    this[name] = JSON.stringify(value, null, 2);
+    console.log(name, value);
   }
 
   _demoTemplate() {
@@ -39,11 +45,14 @@ class DemoPage extends ArcDemoPage {
       demoStates,
       darkThemeActive,
       compatibility,
-      outlined
+      outlined,
+      beforeactions,
+      afteractions,
+      readOnly
     } = this;
     return html`
       <section class="documentation-section">
-        <h3>Interactive demo</h3>
+        <h2>Interactive demo</h2>
         <p>
           This demo lets you preview the Google Drive browser element with various
           configuration options.
@@ -57,11 +66,20 @@ class DemoPage extends ArcDemoPage {
           <request-actions-panel
             ?compatibility="${compatibility}"
             .outlined="${outlined}"
+            ?readOnly="${readOnly}"
             slot="content"
             @beforeactions-changed="${this._actionChanged}"
             @afteractions-changed="${this._actionChanged}"
           ></request-actions-panel>
         </arc-interactive-demo>
+      </section>
+
+      <section class="documentation-section">
+        <h2>Result</h2>
+        <h3>Before request actions</h3>
+        <output>${beforeactions}</output>
+        <h3>After request actions</h3>
+        <output>${afteractions}</output>
       </section>
     `;
   }

@@ -9,14 +9,6 @@
 A panel to define request actions for Advanced REST Client.
 
 
-```html
-<request-actions-panel date="2010-12-10T11:50:45Z" year="numeric" month="narrow" day="numeric"></request-actions-panel>
-```
-
-### API components
-
-This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
-
 ## Usage
 
 ### Installation
@@ -24,78 +16,68 @@ This components is a part of [API components ecosystem](https://elements.advance
 npm install --save @advanced-rest-client/request-actions-panel
 ```
 
-### In an html file
+### In a LitElement
 
-```html
-<html>
-  <head>
-    <script type="module">
-      import '@advanced-rest-client/request-actions-panel/request-actions-panel.js';
-    </script>
-  </head>
-  <body>
-    <request-actions-panel></request-actions-panel>
-  </body>
-</html>
-```
-
-### In a Polymer 3 element
-
-```js
-import {PolymerElement, html} from '@polymer/polymer';
+```javascript
+import { LitElement, html } from 'lit-element';
 import '@advanced-rest-client/request-actions-panel/request-actions-panel.js';
 
-class SampleElement extends PolymerElement {
-  static get template() {
+class SampleElement extends LitElement {
+  render() {
     return html`
-    <request-actions-panel></request-actions-panel>
+    <request-actions-panel
+      ?compatibility="${this.compatibility}"
+      .outlined="${this.outlined}"
+      ?readOnly="${this.readOnly}"
+      .beforeActions="${this.requestActions}"
+      @beforeactions-changed="${this._requestActionsChanged}"
+      .afterActions="${this.responseActions}"
+      @afteractions-changed="${this._responseActionsChanged}"
+    ></request-actions-panel>
     `;
+  }
+
+  _requestActionsChanged(e) {
+    this.requestActions = e.detail.value;
+  }
+
+  _responseActionsChanged(e) {
+    this.responseActions = e.detail.value;
   }
 }
 customElements.define('sample-element', SampleElement);
 ```
 
-## Action data model
+### Action data model
 
 Action can be defined using following properties:
 
-| Property | Type | Description |
-| ----- | ----- | ----- |
-| source | `String` | Source of the data to extract from the request or response object. See below this table for detailed description. |
-| action | `String` | Action to perform. Currently supported are: `assign-variable` -updates variable value in memory, without storing them to the datastore; `store-variable` - updates and stores variable value in the datastore.
-| destination | `String` | For variables manipulation it is the variable name. |
-| enabled | `Boolean` | If sent to false then the action is ignored. |
+**source** (`String`)
 
-### Source option and data path
+Source of the data to extract from the request or response object. See section
+below for detailed description.
+
+**action** (`String`)
+
+Action to perform. Currently supported are: `assign-variable` - updates
+variable value in memory, without storing them to the datastore;
+`store-variable` - updates and stores variable value in the datastore.
+
+**destination** (`String`)
+
+For variables manipulation it is the variable name.
+
+**enabled** (`Boolean`)
+
+If sent to false then the action is ignored.
+
+#### Source option and data path
 
 With source string you can instruct the runner from where to take the value for
 action. General structure is:
 
 ```
-source object . data type [. pRequest action editor. Allows to build data model for request action using
-convinient UI.
-
-## Element use example
-
-```
-<request-action-editor action="{{action}}" opened></request-action-editor>
-```
-
-## Action data model
-
-Action can be defined using following properties:
-
-| Property | Type | Description |
-| ----- | ----- | ----- |
-| source | `String` | Source of the data to extract from the request or response object. See below this table for detailed description. |
-| action | `String` | Action to perform. Currently supported are: `assign-variable` -updates variable value in memory, without storing them to the datastore; `store-variable` - updates and stores variable value in the datastore.
-| destination | `String` | For variables manipulation it is the variable name. |
-| enabled | `Boolean` | If sent to false then the action is ignored. |
-
-### Source option and data path
-
-With source string you can instruct the runner from where to take the value for
-action. General structureath]
+source object . data type [. path]
 ```
 
 Source object can be either `request` or `response`.
@@ -113,9 +95,12 @@ For `url` you can define the following properties:
 -   protocol - Returns URL protocol, e.g. `https:`
 -   path - URL's path, e.g. `/path/to/resource.json`
 -   query - Returns full query string, e.g. `version=1&page=test`
--   query.{any string} - Returns the value of a query parameter. For `query.version` it would return `1`
--   hash - Returns everything that is after the `#` character, e.g. `access_token=token&state=A6RT7W`
--   hast.{any string} - It treats hash as a query parameters and returns the value of the parameter. For `hash.access_token` it would return `token`
+-   query.\[any string\] - Returns the value of a query parameter. For
+`query.version` it would return `1`
+-   hash - Returns everything that is after the `#` character, e.g.
+`access_token=token&state=A6RT7W`
+-   hast.\[any string\] - It treats hash as a query parameters and returns
+the value of the parameter. For `hash.access_token` it would return `token`
 
 For `body` you can define path to the value for XML and JSON data only.
 Any other content type will result with `undefined` value.
@@ -130,8 +115,7 @@ const json = {
     }
   }
 };
-const path = 'property.otherProperty.value';
-// This will return 123456
+const path = 'property.otherProperty.value'; // This returns 123456
 ```
 
 To access array values put the index in the path:
@@ -144,8 +128,7 @@ const json = {
     }
   }]
 };
-const path = 'items.0.otherProperty.value';
-// This will return 123456
+const path = 'items.0.otherProperty.value'; // This returns 123456
 ```
 
 Similar for XML:
@@ -164,16 +147,14 @@ const xmlStr = `<?xml version="1.0"?>
     <phoneNumber>020 7925 0918</phoneNumber>
   </person>
 </people>`;
-path = 'people.person.0.phoneNumber';
-// returns 202-456-1111
+path = 'people.person.0.phoneNumber'; // returns 202-456-1111
 ```
 
 XML path supports `attr(ATTRIBUTE NAME)` function that returns the value of the
 attribute:
 
 ```javascript
-path = 'people.person.0.name.attr(first)';
-// returns george
+path = 'people.person.0.name.attr(first)'; // returns george
 ```
 
 ## Conditions
@@ -192,7 +173,6 @@ Condition data model is:
 ```
 
 Operator can be one of:
-
 -   equal
 -   not-equal
 -   greater-than
@@ -220,25 +200,64 @@ const config = {
 }
 ```
 
+## Iterables
+
+Value for action can be extracted from the response body after iterating over
+iterable data types (array, object). In this case action's `source` property
+should be relative to the object that matches iterator definition.
+
+Iterables can be mixed with conditions. Conditions are checked first, before
+action is performed.
+
+### Example
+
+Getting value from the same object.
+
+```javascript
+// Action configuration
+const config = {
+  source: 'id',
+  action: 'assign-variable',
+  destination: 'personId',
+  iterator: {
+    source: 'items..name',
+    operator: 'equal',
+    condition: 'Smith'
+  }
+}
+// Response
+const response = {
+  items: [{
+    id: 1234,
+    name: 'Brown'
+  }, {
+    id: 5678,
+    name: 'Smith'
+  }]
+}
+```
+Result of the above model would result with assigning `5678` to `personId` variable.
 
 
-### Installation
+## Development
 
 ```sh
 git clone https://github.com/advanced-rest-client/request-actions-panel
-cd api-url-editor
+cd request-actions-panel
 npm install
-npm install -g polymer-cli
 ```
 
 ### Running the demo locally
 
 ```sh
-polymer serve --npm
-open http://127.0.0.1:<port>/demo/
+npm start
 ```
 
 ### Running the tests
 ```sh
-polymer test --npm
+npm test
 ```
+
+## API components
+
+This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)

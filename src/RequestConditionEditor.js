@@ -11,11 +11,9 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import { html, css } from 'lit-element';
-import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
-import '@anypoint-web-components/anypoint-switch/anypoint-switch.js';
-import '../condition-operator-dropdown.js';
 import { ActionBase } from './ActionBase.js';
+import { html, css } from 'lit-element';
+import '../condition-operator-dropdown.js';
 /**
  * An editor for request / response editors.
  * It creates data model that is accetable in ARC elements ecosystem for conditions.
@@ -163,31 +161,18 @@ export class RequestConditionEditor extends ActionBase {
   render() {
     const {
       readOnly,
-      condition,
       compatibility,
       outlined,
-      sourcePath,
-      _pathHidden
+      conditionInputType
     } = this;
+    const condition = this.condition || {};
     return html`
     <div class="container">
       ${this._propertySwitchTemplate()}
       <div class="form">
         ${this._sourceTemplate()}
         ${this._sourceTypeTemplate()}
-
-        <anypoint-input
-          class="source-path"
-          .value="${sourcePath}"
-          name="sourcePath"
-          @value-changed="${this._inputChanged}"
-          ?readonly="${readOnly}"
-          ?compatibility="${compatibility}"
-          ?outlined="${outlined}"
-          ?hidden="${_pathHidden}"
-        >
-          <label slot="label">Path to data (optional)</label>
-        </anypoint-input>
+        ${this._pathTemplate()}
 
         <condition-operator-dropdown
           class="condition-type"
@@ -196,7 +181,7 @@ export class RequestConditionEditor extends ActionBase {
           ?compatibility="${compatibility}"
           ?outlined="${outlined}"
           name="condition.operator"
-          @value-changed="${this._inputChanged}"
+          @value-changed="${this._propertyInputChanged}"
         ></condition-operator-dropdown>
 
         <anypoint-input
@@ -205,18 +190,17 @@ export class RequestConditionEditor extends ActionBase {
           class="condition"
           .value="${condition.condition}"
           name="condition.condition"
-          @value-changed="${this._inputChanged}"
+          @value-changed="${this._propertyInputChanged}"
           ?readonly="${readOnly}"
           ?compatibility="${compatibility}"
           ?outlined="${outlined}"
+          type="${conditionInputType}"
         >
           <label slot="label">Condition value</label>
         </anypoint-input>
       </div>
       ${this._removeTemplate()}
-      </anypoint-icon-button>
-    </div>
-`;
+    </div>`;
   }
 
   static get properties() {
@@ -224,11 +208,7 @@ export class RequestConditionEditor extends ActionBase {
       /**
        * Definied condition.
        */
-      condition: {
-        type: Object,
-        notify: true,
-        observer: '_conditionChanged'
-      },
+      condition: { type: Object },
       /**
        * Value computed from the `action.source` property.
        * Binded to source input field.
@@ -257,12 +237,17 @@ export class RequestConditionEditor extends ActionBase {
 
   set condition(value) {
     const old = this._condition;
+    /* istanbul ignore if */
     if (old === value) {
       return;
     }
     this._condition = value;
     this.requestUpdate('condition', value);
     this._conditionChanged(value);
+  }
+
+  get conditionInputType() {
+    return this.sourceType === 'status' ? 'number' : 'text';
   }
 
   constructor() {
@@ -279,49 +264,10 @@ export class RequestConditionEditor extends ActionBase {
 
   _conditionChanged(condition) {
     this.clear();
+    /* istanbul ignore else */
     if (condition && condition.source) {
       this._processSource(condition.source);
     }
-  }
-  /**
-   * Dispatches the `remove-action-item` custom event so the panel can remove
-   * the item from the list.
-   */
-  remove() {
-    this.dispatchEvent(new CustomEvent('remove-condition-item', {
-      bubbles: false
-    }));
-  }
-  // Computes if path input should be hidden.
-  _computePathHidden(sourceType) {
-    return sourceType === 'status';
-  }
-
-  _inputChanged(e) {
-    const { name, value } = e.target;
-    const cndProp = name.indexOf('condition') === 0;
-    if (cndProp) {
-      this.condition[name] = value;
-    } else {
-      this[name] = value;
-      this._computeSourcePath();
-    }
-    this._notify();
-  }
-
-  _enabledHandler(e) {
-    const { name } = e.target;
-    const value = e.detail.value;
-    this.condition[name] = value;
-    this._notify();
-  }
-
-  _notify() {
-    this.dispatchEvent(new CustomEvent('condition-changed', {
-      detail: {
-        value: this.condition
-      }
-    }));
   }
   /**
    * Non bubbling event notifying parent element that this condition is
