@@ -244,6 +244,7 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
     return css`
     :host {
       display: block;
+      padding: 12px;
     }
 
     header {
@@ -253,6 +254,7 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
     }
 
     h3 {
+      margin: 0;
       font-size: var(--arc-font-subhead-font-size);
       font-weight: var(--arc-font-subhead-font-weight);
       line-height: var(--arc-font-subhead-line-height);

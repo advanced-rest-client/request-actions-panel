@@ -1,7 +1,7 @@
 {
   "name": "@advanced-rest-client/request-actions-panel",
   "description": "A panel to define request actions",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "license": "Apache-2.0",
   "main": "request-actions-panel.js",
   "keywords": [
