@@ -3,7 +3,7 @@
   "description": "A panel to define request actions",
   "version": "3.0.0",
   "license": "Apache-2.0",
-  "main": "arc-settings-pane.js",
+  "main": "request-actions-panel.js",
   "keywords": [
     "advanced-rest-client",
     "settings"
