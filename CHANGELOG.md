@@ -202,3 +202,12 @@
 
 
 
+## [3.0.4](https://github.com/advanced-rest-client/request-actions-panel/compare/0.1.10...3.0.4) (2019-09-17)
+
+
+### Bug Fixes
+
+* fixing package main file ([4976827](https://github.com/advanced-rest-client/request-actions-panel/commit/4976827))
+
+
+
