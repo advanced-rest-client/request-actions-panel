@@ -494,8 +494,7 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
    * handled by `open-external-url` event.
    */
   _seekHelp() {
-    let url = 'https://github.com/advanced-rest-client/';
-    url += 'arc-electron/wiki/Request-actions';
+    const url = 'https://docs.advancedrestclient.com/using-arc/request-actions';
     const e = new CustomEvent('open-external-url', {
       bubbles: true,
       cancelable: true,
