@@ -14,8 +14,10 @@ the License.
 import { LitElement, html, css } from 'lit-element';
 import { VariablesConsumerMixin } from '@advanced-rest-client/variables-consumer-mixin/variables-consumer-mixin.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
-import { helpOutline } from '@advanced-rest-client/arc-icons/ArcIcons.js';
+import '@anypoint-web-components/anypoint-dropdown/anypoint-dropdown.js';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
+import '@anypoint-web-components/anypoint-item/anypoint-item.js';
+import { helpOutline } from '@advanced-rest-client/arc-icons/ArcIcons.js';
 import '../request-action-editor.js';
 import '../request-variable-editor.js';
 /**
@@ -235,7 +237,6 @@ import '../request-variable-editor.js';
  *
  * @memberof UiElements
  * @customElement
- * @polymer
  * @demo demo/index.html
  * @appliesMixin VariablesConsumerMixin
  */
@@ -289,134 +290,30 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
       height: 24px;
       fill: currentColor;
     }
+
+    .dropdown-content {
+      box-shadow: var(--anypoiont-dropdown-shaddow);
+      position: relative;
+      border-radius: 2px;
+      background-color: var(--anypoiont-menu-button-dropdown-background, var(--primary-background-color));
+    }
+
+    :host([compatibility]) .dropdown-content {
+      box-shadow: none;
+      border-top-width: 2px;
+      border-bottom-width: 2px;
+      border-top-color: var(--anypoint-menu-button-border-top-color, var(--anypoint-color-aluminum4));
+      border-bottom-color: var(--anypoint-menu-button-border-bottom-color, var(--anypoint-color-aluminum4));
+      border-top-style: solid;
+      border-bottom-style: solid;
+    }
+
+    .menu-header {
+      font-weight: bold;
+      font-size: 0.8rem;
+      margin: 8px 12px;
+    }
   `;
-  }
-
-  _helpButton() {
-    const {
-      readOnly,
-      compatibility
-    } = this;
-    return html`<anypoint-icon-button
-      class="help-button icon"
-      @click="${this._seekHelp}"
-      aria-label="Activate to open help article"
-      ?disabled="${readOnly}"
-      ?compatibility="${compatibility}"
-    >
-      <span class="icon">${helpOutline}</span>
-    </anypoint-icon-button>`;
-  }
-
-  _createButtonTemplate(handler, label) {
-    const {
-      readOnly,
-      compatibility
-    } = this;
-    return html`<anypoint-button
-      class="action-button"
-      emphasis="low"
-      @click="${handler}"
-      ?compatibility="${compatibility}"
-      ?disabled="${readOnly}"
-    >${label}</anypoint-button>`;
-  }
-
-  _preActionsTemplate() {
-    const items = this.beforeActions.variables;
-    if (!items || !items.length) {
-      return '';
-    }
-    const {
-      readOnly,
-      compatibility,
-      outlined,
-      _variables
-    } = this;
-    return items.map((item, index) => html`
-    <request-variable-editor
-      data-index="${index}"
-      .action="${item}"
-      .variablesSuggestions="${_variables}"
-      @remove="${this._removePreItem}"
-      @action-changed="${this._notifyRequests}"
-      ?readOnly="${readOnly}"
-      ?compatibility="${compatibility}"
-      ?outlined="${outlined}"
-    ></request-variable-editor>`);
-  }
-
-  _postActionsTemplate() {
-    const items = this.afterActions;
-    if (!items || !items.length) {
-      return '';
-    }
-    const {
-      readOnly,
-      compatibility,
-      outlined,
-      _variables
-    } = this;
-    return items.map((item, index) => html`
-    <request-action-editor
-      data-index="${index}"
-      .action="${item}"
-      .variablesSuggestions="${_variables}"
-      opened
-      @action-changed="${this._notifyResponses}"
-      @remove="${this._removePostItem}"
-      ?readOnly="${readOnly}"
-      ?compatibility="${compatibility}"
-      ?outlined="${outlined}"
-    ></request-action-editor>`);
-  }
-
-  _requestTemplate() {
-    const {
-      hasRequestActions
-    } = this;
-    return html`
-    <section class="request-actions-section">
-      <header>
-        <h3>Before request</h3>
-        ${this._helpButton()}
-      </header>
-      ${hasRequestActions ? html`
-        ${this._preActionsTemplate()}
-        ${this._createButtonTemplate(this._addPreActionHandler, 'Add request action')}
-      ` : html`
-      <div class="empty-screen">
-        <p class="info-header">Define actions to be performed <b>before</b> request start.</p>
-        ${this._createButtonTemplate(this._addPreActionHandler, 'Create request action')}
-      </div>`}
-    </section>`;
-  }
-
-  _responseTemplate() {
-    const {
-      hasResponseActions
-    } = this;
-    return html`<section class="response-actions-section">
-      <header>
-        <h3>After response</h3>
-        ${this._helpButton()}
-      </header>
-
-      ${hasResponseActions ? html`
-        ${this._postActionsTemplate()}
-        ${this._createButtonTemplate(this._addPostActionHandler, 'Add response action')}
-      ` : html`
-      <div class="empty-screen">
-        <p class="info-header">Define actions to be performed when <b>response is ready</b>.</p>
-        ${this._createButtonTemplate(this._addPostActionHandler, 'Create response action')}
-      </div>`}
-    </section>`;
-  }
-
-  render() {
-    return html`
-    ${this._requestTemplate()}
-    ${this._responseTemplate()}`;
   }
 
   static get properties() {
@@ -442,10 +339,9 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
        */
       outlined: { type: Boolean },
 
-      _variables: {
-        type: Array,
-        computed: '_processVariables(variables.*)'
-      }
+      _variables: { type: Array, },
+
+      addMenuOpened: { type: Boolean }
     };
   }
   /**
@@ -464,6 +360,10 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
   get hasResponseActions() {
     const items = this.afterActions || [];
     return !!(items && items.length);
+  }
+
+  get addPositionTarget() {
+    return this.shadowRoot.querySelector('#addActionButton');
   }
 
   constructor() {
@@ -636,5 +536,214 @@ export class RequestActionsPanel extends VariablesConsumerMixin(LitElement) {
         value: this.afterActions
       }
     }));
+  }
+
+  _triggerAddActionMenu() {
+    this.addMenuOpened = true;
+  }
+
+  _addActionMenuOpenedHandler(e) {
+    this.addMenuOpened = e.detail.value;
+  }
+
+  async _addActionMenuActivateHandler(e) {
+    const { item } = e.detail;
+    const { action } = item.dataset;
+    this.addMenuOpened = false;
+    await this.updateComplete;
+    this.shadowRoot.querySelector('#addMenuList').selected = undefined;
+    this.addAction(action);
+  }
+
+  addAction(name) {
+
+  }
+
+  _helpButton() {
+    const {
+      readOnly,
+      compatibility
+    } = this;
+    return html`<anypoint-icon-button
+      class="help-button icon"
+      @click="${this._seekHelp}"
+      aria-label="Activate to open help article"
+      ?disabled="${readOnly}"
+      ?compatibility="${compatibility}"
+    >
+      <span class="icon">${helpOutline}</span>
+    </anypoint-icon-button>`;
+  }
+
+  _createButtonTemplate(handler, label) {
+    const {
+      readOnly,
+      compatibility
+    } = this;
+    return html`<anypoint-button
+      class="action-button"
+      emphasis="low"
+      @click="${handler}"
+      ?compatibility="${compatibility}"
+      ?disabled="${readOnly}"
+    >${label}</anypoint-button>`;
+  }
+
+  _preActionsTemplate() {
+    const items = this.beforeActions.variables;
+    if (!items || !items.length) {
+      return '';
+    }
+    const {
+      readOnly,
+      compatibility,
+      outlined,
+      _variables
+    } = this;
+    return items.map((item, index) => html`
+    <request-variable-editor
+      data-index="${index}"
+      .action="${item}"
+      .variablesSuggestions="${_variables}"
+      @remove="${this._removePreItem}"
+      @action-changed="${this._notifyRequests}"
+      ?readOnly="${readOnly}"
+      ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
+    ></request-variable-editor>`);
+  }
+
+  _postActionsTemplate() {
+    const items = this.afterActions;
+    if (!items || !items.length) {
+      return '';
+    }
+    const {
+      readOnly,
+      compatibility,
+      outlined,
+      _variables
+    } = this;
+    return items.map((item, index) => html`
+    <request-action-editor
+      data-index="${index}"
+      .action="${item}"
+      .variablesSuggestions="${_variables}"
+      opened
+      @action-changed="${this._notifyResponses}"
+      @remove="${this._removePostItem}"
+      ?readOnly="${readOnly}"
+      ?compatibility="${compatibility}"
+      ?outlined="${outlined}"
+    ></request-action-editor>`);
+  }
+
+  _requestTemplate() {
+    const {
+      hasRequestActions
+    } = this;
+    return html`
+    <section class="request-actions-section">
+      <header>
+        <h3>Before request</h3>
+        ${this._helpButton()}
+      </header>
+      ${hasRequestActions ? html`
+        ${this._preActionsTemplate()}
+        ${this._createButtonTemplate(this._addPreActionHandler, 'Add request action')}
+      ` : html`
+      <div class="empty-screen">
+        <p class="info-header">Define actions to be performed <b>before</b> request start.</p>
+        ${this._createButtonTemplate(this._addPreActionHandler, 'Create request action')}
+      </div>`}
+    </section>`;
+  }
+
+  _responseTemplate() {
+    const {
+      hasResponseActions
+    } = this;
+    return html`<section class="response-actions-section">
+      <header>
+        <h3>After response</h3>
+        ${this._helpButton()}
+      </header>
+
+      ${hasResponseActions ? html`
+        ${this._postActionsTemplate()}
+        ${this._createButtonTemplate(this._addPostActionHandler, 'Add response action')}
+      ` : html`
+      <div class="empty-screen">
+        <p class="info-header">Define actions to be performed when <b>response is ready</b>.</p>
+        ${this._createButtonTemplate(this._addPostActionHandler, 'Create response action')}
+      </div>`}
+    </section>`;
+  }
+
+  _introTemplate() {
+    return html`
+    <p>
+      Request and response actions allows to execute some predefined logic before
+      a request is executed or after response is received.
+    </p>
+    `;
+  }
+
+  _emptyTemplate() {
+    /*
+    <p class="empty-info">
+      There are no actions defined for this request.
+    </p>
+     */
+    return html`
+    ${this._addButtonTemplate()}
+    `;
+  }
+
+  _renderActions() {
+    return html`
+    ${this._requestTemplate()}
+    ${this._responseTemplate()}
+    `;
+  }
+
+  _addButtonTemplate() {
+    const {
+      addMenuOpened,
+      compatibility,
+      addPositionTarget,
+    } = this;
+    return html`
+    <anypoint-button id="addActionButton" @click="${this._triggerAddActionMenu}">Add action</anypoint-button>
+    <anypoint-dropdown
+      .opened="${addMenuOpened}"
+      .positionTarget="${addPositionTarget}"
+      ?compatibility="${compatibility}"
+      @opened-changed="${this._addActionMenuOpenedHandler}"
+      @activate="${this._addActionMenuActivateHandler}"
+    >
+      <anypoint-listbox
+        slot="dropdown-content"
+        class="dropdown-content"
+        ?compatibility="${compatibility}"
+        selectable="anypoint-item"
+        id="addMenuList"
+      >
+        <p class="menu-header">Request actions</p>
+        <anypoint-item data-action="request-set-var">Set variable</anypoint-item>
+        <anypoint-item data-action="request-del-cookie">Delete cookies</anypoint-item>
+        <p class="menu-header">Response actions</p>
+        <anypoint-item data-action="response-set-var">Set variable</anypoint-item>
+      </anypoint-listbox>
+    </anypoint-dropdown>
+    `;
+  }
+
+  render() {
+    const { hasActions } = this;
+    return html`
+    ${this._introTemplate()}
+    ${hasActions ? this._renderActions() : this._emptyTemplate()}
+    `;
   }
 }
