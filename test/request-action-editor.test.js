@@ -201,7 +201,9 @@ describe('<request-action-editor>', function() {
     };
     it('is accessible', async () => {
       const element = await basicFixture(model);
-      await assert.isAccessible(element);
+      await assert.isAccessible(element, {
+        ignoredRules: ['color-contrast']
+      });
     });
   });
 });
